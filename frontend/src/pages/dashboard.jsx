@@ -1,303 +1,338 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-const API_URL = "http://localhost:3000";
-const RB_LOGS_URL = "https://rblogs-psi.vercel.app/#portfolio";
+import React, { useEffect, useMemo, useState } from "react";
 
 /* =========================================================
-   CATÁLOGO DE AÇÕES
-   Estas ações NÃO aparecem automaticamente na tela.
-   Elas somente ficam disponíveis para o gerente/líder
-   selecionar ao registrar uma ação.
-========================================================= */
+   MORRO DO FÊNIX — DASHBOARD
+   ========================================================= */
 
-const ACOES = [
+const ACTIONS = [
   {
-    nome: "FAST FOOD",
-    categoria: "Normal",
-    bandidosMin: 2,
-    bandidosMax: 3,
-    armamento: "Apenas Pistolas",
-    valor: 200000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "FAST FOOD",
+    category: "Pequena",
+    policeMin: 4,
+    policeMax: 5,
+    criminalsMin: 2,
+    criminalsMax: 3,
+    weapon: "Apenas Pistolas",
+    value: 200000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "AMMU-NATION",
-    categoria: "Normal",
-    bandidosMin: 1,
-    bandidosMax: 4,
-    armamento: "Apenas Pistolas",
-    valor: 120000,
-    itens: "1x Lockpick",
-    descricao:
-      "Apenas dentro do estabelecimento. Perímetro restrito à parte interna.",
+    name: "AMMU-NATION",
+    category: "Pequena",
+    policeMin: 4,
+    policeMax: 6,
+    criminalsMin: 1,
+    criminalsMax: 4,
+    weapon: "Apenas Pistolas",
+    value: 120000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão. Somente parte interna da Ammu.",
   },
   {
-    nome: "MC DONALDS",
-    categoria: "Normal",
-    bandidosMin: 2,
-    bandidosMax: 3,
-    armamento: "Apenas Pistolas",
-    valor: 200000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "MC DONALDS",
+    category: "Pequena",
+    policeMin: 3,
+    policeMax: 4,
+    criminalsMin: 2,
+    criminalsMax: 3,
+    weapon: "Apenas Pistolas",
+    value: 200000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "SKATE",
-    categoria: "Normal",
-    bandidosMin: 1,
-    bandidosMax: 2,
-    armamento: "Apenas Pistolas",
-    valor: 100000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "SKATE",
+    category: "Pequena",
+    policeMin: 2,
+    policeMax: 3,
+    criminalsMin: 1,
+    criminalsMax: 2,
+    weapon: "Apenas Pistolas",
+    value: 100000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "CHINA",
-    categoria: "Normal",
-    bandidosMin: 4,
-    bandidosMax: 6,
-    armamento: "Apenas Pistolas",
-    valor: 250000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "CHINA",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 8,
+    criminalsMin: 4,
+    criminalsMax: 6,
+    weapon: "Apenas Pistolas",
+    value: 250000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "COMEDY",
-    categoria: "Normal",
-    bandidosMin: 3,
-    bandidosMax: 5,
-    armamento: "Apenas Pistolas",
-    valor: 300000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "COMEDY",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 8,
+    criminalsMin: 3,
+    criminalsMax: 5,
+    weapon: "Apenas Pistolas",
+    value: 300000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "FLEECA",
-    categoria: "Normal",
-    bandidosMin: 4,
-    bandidosMax: 6,
-    armamento: "Apenas Pistolas",
-    valor: 140000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "FLEECA",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 8,
+    criminalsMin: 4,
+    criminalsMax: 6,
+    weapon: "Apenas Pistolas",
+    value: 140000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "COSTUREIRA",
-    categoria: "Normal",
-    bandidosMin: 3,
-    bandidosMax: 5,
-    armamento: "Apenas Pistolas",
-    valor: 300000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "COSTUREIRA",
+    category: "Pequena",
+    policeMin: 5,
+    policeMax: 7,
+    criminalsMin: 3,
+    criminalsMax: 5,
+    weapon: "Apenas Pistolas",
+    value: 300000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "OBSERVATÓRIO",
-    categoria: "Normal",
-    bandidosMin: 7,
-    bandidosMax: 11,
-    armamento: "Pistolas ou Sub's",
-    valor: 800000,
-    itens: "2x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "OBSERVÁTORIO",
+    category: "Pequena",
+    policeMin: 11,
+    policeMax: 15,
+    criminalsMin: 7,
+    criminalsMax: 11,
+    weapon: "Pistolas ou Sub's",
+    value: 800000,
+    items: "2x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "GALINHEIRO",
-    categoria: "Normal",
-    bandidosMin: 6,
-    bandidosMax: 10,
-    armamento: "PT's ou Sub's",
-    valor: 800000,
-    itens: "1x Lockpick",
-    descricao:
-      "Teti-Chão. Perímetro restrito somente à parte interna.",
+    name: "GALINHEIRO",
+    category: "Pequena",
+    policeMin: 9,
+    policeMax: 13,
+    criminalsMin: 6,
+    criminalsMax: 10,
+    weapon: "Apenas PT's ou Sub's",
+    value: 800000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão. Somente parte interna.",
   },
   {
-    nome: "AÇOUGUE",
-    categoria: "Normal",
-    bandidosMin: 5,
-    bandidosMax: 7,
-    armamento: "PT's ou Sub's",
-    valor: 400000,
-    itens: "1x Lockpick",
-    descricao:
-      "Teti-Chão. Perímetro restrito somente à parte interna.",
+    name: "AÇOUGUE",
+    category: "Pequena",
+    policeMin: 8,
+    policeMax: 10,
+    criminalsMin: 5,
+    criminalsMax: 7,
+    weapon: "Apenas PT's ou Sub's",
+    value: 400000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão. Somente parte interna.",
   },
   {
-    nome: "BURGUER SHOT",
-    categoria: "Normal",
-    bandidosMin: 1,
-    bandidosMax: 2,
-    armamento: "Apenas Pistolas",
-    valor: 120000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "BURGUER SHOT",
+    category: "Pequena",
+    policeMin: 3,
+    policeMax: 4,
+    criminalsMin: 1,
+    criminalsMax: 2,
+    weapon: "Apenas Pistolas",
+    value: 120000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "DEPARTAMENTO POLICIAL",
-    categoria: "Normal",
-    bandidosMin: 3,
-    bandidosMax: 5,
-    armamento: "Apenas Pistolas",
-    valor: 180000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "DEPARTAMENTO POLICIAL",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 8,
+    criminalsMin: 3,
+    criminalsMax: 5,
+    weapon: "Apenas Pistolas",
+    value: 180000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "HOTEL ABANDONADO",
-    categoria: "Normal",
-    bandidosMin: 4,
-    bandidosMax: 5,
-    armamento: "Apenas Pistolas",
-    valor: 220000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "HOTEL ABANDONADO",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 7,
+    criminalsMin: 4,
+    criminalsMax: 5,
+    weapon: "Apenas Pistolas",
+    value: 220000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "MERGULHADOR",
-    categoria: "Normal",
-    bandidosMin: 3,
-    bandidosMax: 5,
-    armamento: "Apenas Pistolas",
-    valor: 200000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "MERGULHADOR",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 8,
+    criminalsMin: 3,
+    criminalsMax: 5,
+    weapon: "Apenas Pistolas",
+    value: 200000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "YELLOW JACK",
-    categoria: "Normal",
-    bandidosMin: 2,
-    bandidosMax: 4,
-    armamento: "Apenas Pistolas",
-    valor: 120000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão. Permitido apenas 1 bandido fora.",
+    name: "YELLOW JACK",
+    category: "Pequena",
+    policeMin: 4,
+    policeMax: 6,
+    criminalsMin: 2,
+    criminalsMax: 4,
+    weapon: "Apenas Pistolas",
+    value: 120000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão. Permitido apenas 1 bandido fora.",
   },
   {
-    nome: "MOTOCLUBE",
-    categoria: "Normal",
-    bandidosMin: 3,
-    bandidosMax: 5,
-    armamento: "Apenas Pistolas",
-    valor: 300000,
-    itens: "1x Lockpick",
-    descricao:
-      "Teti-Chão. Somente dois bandidos na parte interna.",
+    name: "MOTOCLUBE",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 8,
+    criminalsMin: 3,
+    criminalsMax: 5,
+    weapon: "Apenas Pistolas",
+    value: 300000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão. Somente dois bandidos na parte interna.",
   },
   {
-    nome: "GOLF",
-    categoria: "Normal",
-    bandidosMin: 4,
-    bandidosMax: 6,
-    armamento: "Apenas Pistolas",
-    valor: 200000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "GOLF",
+    category: "Pequena",
+    policeMin: 6,
+    policeMax: 8,
+    criminalsMin: 4,
+    criminalsMax: 6,
+    weapon: "Apenas Pistolas",
+    value: 200000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
   {
-    nome: "LOJINHA 6",
-    categoria: "Normal",
-    bandidosMin: 1,
-    bandidosMax: 3,
-    armamento: "Apenas Pistolas",
-    valor: 160000,
-    itens: "1x Lockpick",
-    descricao: "Teti-Chão.",
+    name: "LOJINHA 6",
+    category: "Pequena",
+    policeMin: 3,
+    policeMax: 5,
+    criminalsMin: 1,
+    criminalsMax: 3,
+    weapon: "Apenas Pistolas",
+    value: 160000,
+    items: "1x Lockpick",
+    rules: "Teti-Chão",
   },
 
   {
-    nome: "BANCO CENTRAL",
-    categoria: "Grande",
-    bandidosMin: 8,
-    bandidosMax: 12,
-    armamento: "Fuzis + equipamentos especiais",
-    valor: 3500000,
-    itens: "3x Pendrive",
-    descricao: "Proibido utilizar o topo da coroa.",
+    name: "BANCO CENTRAL",
+    category: "Grande",
+    policeMin: 13,
+    policeMax: 17,
+    criminalsMin: 8,
+    criminalsMax: 12,
+    weapon: "Fuzis + DUAS Remington (12) e UMA Sniper de cada lado",
+    value: 3500000,
+    items: "3x Pendrive",
+    rules: "Proibido utilizar o topo da coroa.",
   },
   {
-    nome: "BANCO PALETO",
-    categoria: "Grande",
-    bandidosMin: 8,
-    bandidosMax: 12,
-    armamento: "Fuzis + equipamentos especiais",
-    valor: 1250000,
-    itens: "3x Pendrive",
-    descricao: "Ação grande.",
+    name: "BANCO PALETO",
+    category: "Grande",
+    policeMin: 12,
+    policeMax: 16,
+    criminalsMin: 8,
+    criminalsMax: 12,
+    weapon: "Fuzis + DUAS Remington (12) e UMA Sniper de cada lado",
+    value: 1250000,
+    items: "3x Pendrive",
+    rules: "Ação grande.",
   },
   {
-    nome: "NIÓBIO",
-    categoria: "Grande",
-    bandidosMin: 6,
-    bandidosMax: 11,
-    armamento: "Fuzis + equipamentos especiais",
-    valor: 2300000,
-    itens: "1x Pendrive",
-    descricao:
-      "Perímetro restrito somente à parte interna do Nióbio.",
+    name: "NIÓBIO",
+    category: "Grande",
+    policeMin: 13,
+    policeMax: 18,
+    criminalsMin: 6,
+    criminalsMax: 11,
+    weapon: "Fuzis + DUAS Remington (12) para ambos os lados",
+    value: 2300000,
+    items: "1x Pendrive",
+    rules: "Perímetro restrito à parte interna.",
   },
   {
-    nome: "AEROPORTO",
-    categoria: "Grande",
-    bandidosMin: 6,
-    bandidosMax: 12,
-    armamento: "Submetralhadora",
-    valor: 2000000,
-    itens: "1x Pendrive",
-    descricao:
-      "Não atirar enquanto os policiais sobem a escada.",
+    name: "AEROPORTO",
+    category: "Grande",
+    policeMin: 14,
+    policeMax: 20,
+    criminalsMin: 6,
+    criminalsMax: 12,
+    weapon: "Submetralhadora",
+    value: 2000000,
+    items: "1x Pendrive",
+    rules: "Não atirar enquanto policiais sobem a escada.",
   },
   {
-    nome: "CINEMA",
-    categoria: "Grande",
-    bandidosMin: 12,
-    bandidosMax: 18,
-    armamento: "Fuzil",
-    valor: 5000000,
-    itens: "3x Pendrive",
-    descricao:
-      "Teti-Chão. Dois bandidos na área da piscina. Permitidos primeiro e segundo andar do estacionamento.",
+    name: "CINEMA",
+    category: "Grande",
+    policeMin: 18,
+    policeMax: 24,
+    criminalsMin: 12,
+    criminalsMax: 18,
+    weapon: "Fuzil",
+    value: 5000000,
+    items: "3x Pendrive",
+    rules: "Somente dois bandidos na área da piscina.",
   },
   {
-    nome: "HOLLYWOOD",
-    categoria: "Grande",
-    bandidosMin: 8,
-    bandidosMax: 12,
-    armamento: "Fuzis + equipamentos especiais",
-    valor: 3500000,
-    itens: "3x Pendrive",
-    descricao: "Teti-Chão.",
+    name: "HOLLYWOOD",
+    category: "Grande",
+    policeMin: 14,
+    policeMax: 18,
+    criminalsMin: 8,
+    criminalsMax: 12,
+    weapon: "Fuzis + DUAS Remington (12) para ambos os lados",
+    value: 3500000,
+    items: "3x Pendrive",
+    rules: "Teti-Chão",
   },
   {
-    nome: "PORTA-AVIÕES",
-    categoria: "Grande",
-    bandidosMin: 8,
-    bandidosMax: 12,
-    armamento: "Fuzis + equipamentos especiais",
-    valor: 3500000,
-    itens: "3x Pendrive",
-    descricao: "Ação grande.",
+    name: "PORTA-AVIÕES",
+    category: "Grande",
+    policeMin: 14,
+    policeMax: 18,
+    criminalsMin: 8,
+    criminalsMax: 12,
+    weapon: "Fuzis + DUAS Remington (12) para ambos os lados",
+    value: 3500000,
+    items: "3x Pendrive",
+    rules: "Ação grande.",
   },
   {
-    nome: "JOALHERIA",
-    categoria: "Grande",
-    bandidosMin: 7,
-    bandidosMax: 9,
-    armamento: "Fuzis + equipamentos especiais",
-    valor: 2300000,
-    itens: "2x Pendrive",
-    descricao:
-      "Permitido à polícia utilizar até dois helicópteros.",
+    name: "JOALHERIA",
+    category: "Grande",
+    policeMin: 10,
+    policeMax: 12,
+    criminalsMin: 7,
+    criminalsMax: 9,
+    weapon: "Fuzis + DUAS Remington (12) para ambos os lados",
+    value: 2300000,
+    items: "2x Pendrive",
+    rules: "Permitido até dois helicópteros.",
   },
 ];
 
-/* =========================================================
-   PRODUTOS
-========================================================= */
-
-const PRODUTOS = [
+const PRODUCTS = [
   "Algemas",
   "Pendrive",
   "Colete",
@@ -306,3265 +341,2988 @@ const PRODUTOS = [
   "Ticket",
 ];
 
-/* =========================================================
-   UTILITÁRIOS
-========================================================= */
+const emptyForm = {
+  leader: "",
+  action: "",
+};
 
-function dinheiro(valor) {
-  return Number(valor || 0).toLocaleString("pt-BR", {
+function money(value) {
+  return Number(value || 0).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
 }
 
-function agora() {
-  return new Date().toLocaleString("pt-BR");
+function today() {
+  return new Date().toLocaleDateString("pt-BR");
 }
 
-function cargoNormalizado(cargo) {
-  return String(cargo || "").toUpperCase();
+function load(key, fallback = []) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
-function Button({ children, onClick, variant = "gold", type = "button", disabled }) {
+function save(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem("usuario")) ||
+      JSON.parse(localStorage.getItem("user")) ||
+      {};
+  } catch {
+    return {};
+  }
+}
+
+function Badge({ children, type = "gold" }) {
+  return <span className={`badge badge-${type}`}>{children}</span>;
+}
+
+function SectionTitle({ title, subtitle }) {
   return (
-    <button
-      type={type}
-      className={`mf-btn mf-btn-${variant}`}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Field({ label, children }) {
-  return (
-    <div className="mf-field">
-      <label>{label}</label>
-      {children}
+    <div className="section-title">
+      <div>
+        <h2>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+      </div>
     </div>
   );
 }
 
-function Card({ children, className = "" }) {
-  return <section className={`mf-card ${className}`}>{children}</section>;
-}
+function Dashboard() {
+  const user = getCurrentUser();
 
-function Empty({ text = "Nenhum registro encontrado." }) {
-  return (
-    <div className="mf-empty">
-      <div className="mf-empty-icon">—</div>
-      <strong>{text}</strong>
-    </div>
+  const role = String(
+    user?.cargo ||
+      user?.role ||
+      user?.perfil ||
+      user?.tipo ||
+      "membro"
+  ).toLowerCase();
+
+  const isManager =
+    role.includes("gerente") ||
+    role.includes("admin") ||
+    role.includes("dono") ||
+    role.includes("owner");
+
+  const isLeader =
+    role.includes("lider") ||
+    role.includes("líder") ||
+    isManager;
+
+  const [activeTab, setActiveTab] = useState(
+    isManager ? "inicio" : "membros"
   );
-}
 
-/* =========================================================
-   DASHBOARD
-========================================================= */
+  const [actions, setActions] = useState(() =>
+    load("morro_fenix_acoes_registradas")
+  );
 
-export default function Dashboard() {
-  const navigate = useNavigate();
+  const [sales, setSales] = useState(() =>
+    load("morro_fenix_vendas")
+  );
 
-  const [usuario, setUsuario] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [pagina, setPagina] = useState("inicio");
+  const [orders, setOrders] = useState(() =>
+    load("morro_fenix_encomendas")
+  );
 
-  const [acoesRegistradas, setAcoesRegistradas] = useState([]);
-  const [participantes, setParticipantes] = useState({});
+  const [adv, setAdv] = useState(() =>
+    load("morro_fenix_adv")
+  );
 
-  const [registros, setRegistros] = useState({
-    vendas: [],
-    encomendas: [],
-    lavagemCliente: [],
-    lavagemMembro: [],
-    adv: [],
-    rebaixamentos: [],
-    parcerias: [],
-    recrutamentos: [],
-    ausencias: [],
+  const [wash, setWash] = useState(() =>
+    load("morro_fenix_lavagens")
+  );
+
+  const [recruitments, setRecruitments] = useState(() =>
+    load("morro_fenix_recrutamentos")
+  );
+
+  const [absences, setAbsences] = useState(() =>
+    load("morro_fenix_ausencias")
+  );
+
+  const [members, setMembers] = useState(() =>
+    load("morro_fenix_membros")
+  );
+
+  const [records, setRecords] = useState(() =>
+    load("morro_fenix_registros")
+  );
+
+  const [actionForm, setActionForm] = useState(emptyForm);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [saleForm, setSaleForm] = useState({
+    seller: user?.nome || "",
+    items: [],
+    quantity: 1,
+    notes: "",
   });
 
-  const [abaRegistros, setAbaRegistros] = useState("vendas");
-  const [menuAberto, setMenuAberto] = useState(false);
+  const [orderForm, setOrderForm] = useState({
+    requester: user?.nome || "",
+    items: [],
+    delivery: "",
+    notes: "",
+  });
+
+  const [advForm, setAdvForm] = useState({
+    member: "",
+    levels: [],
+    reason: "",
+  });
+
+  const [washForm, setWashForm] = useState({
+    client: "",
+    id: "",
+    value: "",
+    partnership: "nao",
+    responsible: user?.nome || "",
+    proof: "",
+  });
+
+  const [recruitForm, setRecruitForm] = useState({
+    name: "",
+    id: "",
+    discord: "",
+    responsible: user?.nome || "",
+  });
+
+  const [absenceForm, setAbsenceForm] = useState({
+    member: user?.nome || "",
+    date: "",
+    reason: "",
+  });
+
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
-    verificarSessao();
-  }, []);
+    save("morro_fenix_acoes_registradas", actions);
+  }, [actions]);
 
-  async function verificarSessao() {
-    const token = localStorage.getItem("morro_fenix_token");
+  useEffect(() => {
+    save("morro_fenix_vendas", sales);
+  }, [sales]);
 
-    if (!token) {
-      navigate("/login");
+  useEffect(() => {
+    save("morro_fenix_encomendas", orders);
+  }, [orders]);
+
+  useEffect(() => {
+    save("morro_fenix_adv", adv);
+  }, [adv]);
+
+  useEffect(() => {
+    save("morro_fenix_lavagens", wash);
+  }, [wash]);
+
+  useEffect(() => {
+    save("morro_fenix_recrutamentos", recruitments);
+  }, [recruitments]);
+
+  useEffect(() => {
+    save("morro_fenix_ausencias", absences);
+  }, [absences]);
+
+  useEffect(() => {
+    save("morro_fenix_membros", members);
+  }, [members]);
+
+  useEffect(() => {
+    save("morro_fenix_registros", records);
+  }, [records]);
+
+  function notify(message) {
+    setNotice(message);
+    setTimeout(() => setNotice(""), 3000);
+  }
+
+  function registerRecord(type, data) {
+    setRecords((old) => [
+      {
+        id: Date.now(),
+        type,
+        date: today(),
+        author: user?.nome || "Sistema",
+        ...data,
+      },
+      ...old,
+    ]);
+  }
+
+  function registerAction(e) {
+    e.preventDefault();
+
+    if (!actionForm.leader || !actionForm.action) {
+      notify("Preencha o líder e selecione uma ação.");
       return;
     }
 
-    try {
-      const resposta = await fetch(`${API_URL}/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    const info = ACTIONS.find(
+      (item) => item.name === actionForm.action
+    );
 
-      const dados = await resposta.json();
-
-      if (!resposta.ok || !dados.sucesso) {
-        localStorage.removeItem("morro_fenix_token");
-        localStorage.removeItem("morro_fenix_usuario");
-        navigate("/login");
-        return;
-      }
-
-      setUsuario(dados.usuario);
-    } catch (erro) {
-      console.error(erro);
-      navigate("/login");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function adicionarRegistro(tipo, registro) {
-    setRegistros((estado) => ({
-      ...estado,
-      [tipo]: [registro, ...estado[tipo]],
-    }));
-  }
-
-  function registrarAcao(acao, lider) {
-    const registro = {
-      id: crypto.randomUUID(),
-      nome: acao.nome,
-      categoria: acao.categoria,
-      bandidosMin: acao.bandidosMin,
-      bandidosMax: acao.bandidosMax,
-      armamento: acao.armamento,
-      valor: acao.valor,
-      itens: acao.itens,
-      descricao: acao.descricao,
-      lider,
-      data: agora(),
+    const newAction = {
+      id: Date.now(),
+      leader: actionForm.leader,
+      action: info.name,
+      category: info.category,
+      policeMin: info.policeMin,
+      policeMax: info.policeMax,
+      criminalsMin: info.criminalsMin,
+      criminalsMax: info.criminalsMax,
+      weapon: info.weapon,
+      value: info.value,
+      items: info.items,
+      rules: info.rules,
+      participants: [],
+      status: "ABERTA",
+      date: today(),
     };
 
-    setAcoesRegistradas((lista) => [registro, ...lista]);
-    setPagina("acoes");
+    setActions((old) => [newAction, ...old]);
+    registerRecord("AÇÃO", newAction);
+    setActionForm(emptyForm);
+    notify("Ação registrada.");
   }
 
-  function participarAcao(id) {
-    const listaAtual = participantes[id] || [];
+  function toggleActionParticipant(actionId) {
+    const currentName = user?.nome || "Membro";
 
-    if (listaAtual.some((membro) => membro.id === usuario.id)) {
+    setActions((old) =>
+      old.map((item) => {
+        if (item.id !== actionId) return item;
+
+        const already = item.participants.includes(currentName);
+
+        if (already) {
+          return {
+            ...item,
+            participants: item.participants.filter(
+              (name) => name !== currentName
+            ),
+          };
+        }
+
+        const max = item.criminalsMax;
+
+        if (item.participants.length >= max) {
+          notify("O limite máximo de membros dessa ação foi atingido.");
+          return item;
+        }
+
+        return {
+          ...item,
+          participants: [...item.participants, currentName],
+        };
+      })
+    );
+  }
+
+  function toggleProduct(product, setter, current) {
+    if (current.includes(product)) {
+      setter(current.filter((item) => item !== product));
+    } else {
+      setter([...current, product]);
+    }
+  }
+
+  function registerSale(e) {
+    e.preventDefault();
+
+    if (!saleForm.seller || saleForm.items.length === 0) {
+      notify("Selecione pelo menos um produto.");
       return;
     }
 
-    const acao = acoesRegistradas.find((item) => item.id === id);
+    const item = {
+      id: Date.now(),
+      seller: saleForm.seller,
+      items: saleForm.items,
+      quantity: Number(saleForm.quantity),
+      notes: saleForm.notes,
+      date: today(),
+      status: "REGISTRADA",
+    };
 
-    if (!acao) return;
+    setSales((old) => [item, ...old]);
+    registerRecord("VENDA", item);
 
-    if (listaAtual.length >= acao.bandidosMax) {
+    setSaleForm({
+      seller: user?.nome || "",
+      items: [],
+      quantity: 1,
+      notes: "",
+    });
+
+    notify("Venda registrada.");
+  }
+
+  function registerOrder(e) {
+    e.preventDefault();
+
+    if (!orderForm.requester || orderForm.items.length === 0) {
+      notify("Preencha o solicitante e selecione os produtos.");
       return;
     }
 
-    setParticipantes((estado) => ({
-      ...estado,
-      [id]: [
-        ...listaAtual,
-        {
-          id: usuario.id,
-          nome: usuario.nome,
-        },
-      ],
-    }));
+    if (!orderForm.delivery) {
+      notify("Informe a data de entrega.");
+      return;
+    }
+
+    const item = {
+      id: Date.now(),
+      requester: orderForm.requester,
+      items: orderForm.items,
+      delivery: orderForm.delivery,
+      notes: orderForm.notes,
+      date: today(),
+      status: "PENDENTE",
+    };
+
+    setOrders((old) => [item, ...old]);
+    registerRecord("ENCOMENDA", item);
+
+    setOrderForm({
+      requester: user?.nome || "",
+      items: [],
+      delivery: "",
+      notes: "",
+    });
+
+    notify("Encomenda registrada.");
   }
 
-  function sairAcao(id) {
-    setParticipantes((estado) => ({
-      ...estado,
-      [id]: (estado[id] || []).filter(
-        (membro) => membro.id !== usuario.id
-      ),
-    }));
+  function registerAdv(e) {
+    e.preventDefault();
+
+    if (!advForm.member || advForm.levels.length === 0) {
+      notify("Selecione o membro e pelo menos um ADV.");
+      return;
+    }
+
+    const item = {
+      id: Date.now(),
+      member: advForm.member,
+      levels: advForm.levels,
+      reason: advForm.reason,
+      date: today(),
+      responsible: user?.nome || "Gerente",
+    };
+
+    setAdv((old) => [item, ...old]);
+    registerRecord("ADV / REBAIXAMENTO", item);
+
+    setAdvForm({
+      member: "",
+      levels: [],
+      reason: "",
+    });
+
+    notify("Registro de ADV salvo.");
   }
 
-  function logout() {
-    localStorage.removeItem("morro_fenix_token");
-    localStorage.removeItem("morro_fenix_usuario");
-    navigate("/login");
+  function registerWash(e) {
+    e.preventDefault();
+
+    const value = Number(
+      String(washForm.value).replace(/\./g, "").replace(",", ".")
+    );
+
+    if (!washForm.client || !value || !washForm.responsible) {
+      notify("Preencha os dados da lavagem.");
+      return;
+    }
+
+    const percentage = washForm.partnership === "sim" ? 20 : 30;
+    const facValue = value * (percentage / 100);
+    const remaining = value - facValue;
+
+    const item = {
+      id: Date.now(),
+      client: washForm.client,
+      clientId: washForm.id,
+      value,
+      partnership: washForm.partnership === "sim",
+      percentage,
+      facValue,
+      remaining,
+      responsible: washForm.responsible,
+      proof: washForm.proof,
+      date: today(),
+      status: "PENDENTE",
+    };
+
+    setWash((old) => [item, ...old]);
+    registerRecord("LAVAGEM CLIENTE", item);
+
+    setWashForm({
+      client: "",
+      id: "",
+      value: "",
+      partnership: "nao",
+      responsible: user?.nome || "",
+      proof: "",
+    });
+
+    notify("Lavagem registrada.");
   }
 
-  if (loading) {
+  function registerRecruitment(e) {
+    e.preventDefault();
+
+    if (!recruitForm.name || !recruitForm.id) {
+      notify("Preencha nome e ID.");
+      return;
+    }
+
+    const item = {
+      id: Date.now(),
+      name: recruitForm.name,
+      memberId: recruitForm.id,
+      discord: recruitForm.discord,
+      responsible: recruitForm.responsible,
+      date: today(),
+      status: "PENDENTE",
+    };
+
+    setRecruitments((old) => [item, ...old]);
+    registerRecord("RECRUTAMENTO", item);
+
+    setRecruitForm({
+      name: "",
+      id: "",
+      discord: "",
+      responsible: user?.nome || "",
+    });
+
+    notify("Recrutamento registrado.");
+  }
+
+  function registerAbsence(e) {
+    e.preventDefault();
+
+    if (!absenceForm.member || !absenceForm.date) {
+      notify("Informe membro e data.");
+      return;
+    }
+
+    const item = {
+      id: Date.now(),
+      member: absenceForm.member,
+      dateAbsence: absenceForm.date,
+      reason: absenceForm.reason,
+      created: today(),
+    };
+
+    setAbsences((old) => [item, ...old]);
+    registerRecord("AUSÊNCIA", item);
+
+    setAbsenceForm({
+      member: user?.nome || "",
+      date: "",
+      reason: "",
+    });
+
+    notify("Ausência registrada.");
+  }
+
+  const rankings = useMemo(() => {
+    const recruitmentMap = {};
+    const salesMap = {};
+    const actionMap = {};
+    const washMap = {};
+
+    recruitments.forEach((item) => {
+      const key = item.responsible || "Desconhecido";
+      recruitmentMap[key] = (recruitmentMap[key] || 0) + 1;
+    });
+
+    sales.forEach((item) => {
+      const key = item.seller || "Desconhecido";
+      salesMap[key] =
+        (salesMap[key] || 0) + Number(item.quantity || 1);
+    });
+
+    actions.forEach((item) => {
+      (item.participants || []).forEach((member) => {
+        actionMap[member] = (actionMap[member] || 0) + 1;
+      });
+    });
+
+    wash.forEach((item) => {
+      const key = item.responsible || "Desconhecido";
+      washMap[key] = (washMap[key] || 0) + 1;
+    });
+
+    const sort = (map) =>
+      Object.entries(map)
+        .map(([name, points]) => ({ name, points }))
+        .sort((a, b) => b.points - a.points);
+
+    return {
+      recruitment: sort(recruitmentMap),
+      sales: sort(salesMap),
+      actions: sort(actionMap),
+      wash: sort(washMap),
+    };
+  }, [recruitments, sales, actions, wash]);
+
+  const registeredActions = actions;
+
+  const menu = [
+    ...(isManager
+      ? [
+          { id: "inicio", label: "Visão Geral", icon: "⌂" },
+          { id: "registrar-acao", label: "Registrar Ação", icon: "＋" },
+          { id: "vendas", label: "Vendas", icon: "◈" },
+          { id: "encomendas", label: "Encomendas", icon: "▣" },
+          { id: "adv", label: "ADV / Rebaixamento", icon: "!" },
+          { id: "lavagem", label: "Lavagem Cliente", icon: "◆" },
+          { id: "recrutamento", label: "Recrutamento", icon: "♙" },
+          { id: "registros", label: "Registros", icon: "☷" },
+        ]
+      : []),
+
+    { id: "acoes", label: "Ações", icon: "⚔" },
+    { id: "membros", label: "Membros", icon: "♟" },
+    { id: "rankings", label: "Rankings", icon: "★" },
+
+    ...(!isManager
+      ? [{ id: "ausencia", label: "Ausência", icon: "◷" }]
+      : []),
+
+    ...(isLeader
+      ? [{ id: "lider", label: "Painel do Líder", icon: "♛" }]
+      : []),
+
+    ...(isManager
+      ? [{ id: "gerente", label: "Painel Gerente", icon: "◆" }]
+      : []),
+  ];
+
+  function renderProductSelector(items, setter, current) {
+    return (
+      <div className="product-grid">
+        {PRODUCTS.map((product) => {
+          const selected = current.includes(product);
+
+          return (
+            <button
+              type="button"
+              key={product}
+              className={`product-button ${
+                selected ? "selected" : ""
+              }`}
+              onClick={() =>
+                toggleProduct(product, setter, current)
+              }
+            >
+              <span>{selected ? "✓" : "+"}</span>
+              {product}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderInicio() {
     return (
       <>
-        <style>{CSS}</style>
-        <div className="mf-loading">
-          <div className="mf-logo">MF</div>
-          <strong>Morro do Fênix</strong>
-          <span>Carregando sistema...</span>
+        <SectionTitle
+          title="Visão Geral"
+          subtitle="Painel administrativo do Morro do Fênix"
+        />
+
+        <div className="stats-grid">
+          <div className="stat-card">
+            <span>Ações registradas</span>
+            <strong>{actions.length}</strong>
+            <small>Ações atualmente cadastradas</small>
+          </div>
+
+          <div className="stat-card">
+            <span>Vendas</span>
+            <strong>{sales.length}</strong>
+            <small>Registros de vendas</small>
+          </div>
+
+          <div className="stat-card">
+            <span>Encomendas</span>
+            <strong>{orders.length}</strong>
+            <small>Pedidos cadastrados</small>
+          </div>
+
+          <div className="stat-card">
+            <span>Lavagens</span>
+            <strong>{wash.length}</strong>
+            <small>Lavagens registradas</small>
+          </div>
+        </div>
+
+        <div className="dashboard-grid">
+          <div className="panel-card">
+            <h3>Atividade recente</h3>
+
+            {records.length === 0 ? (
+              <div className="empty">
+                Nenhum registro realizado ainda.
+              </div>
+            ) : (
+              records.slice(0, 6).map((item) => (
+                <div className="activity" key={item.id}>
+                  <div>
+                    <strong>{item.type}</strong>
+                    <span>{item.author}</span>
+                  </div>
+                  <small>{item.date}</small>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="panel-card">
+            <h3>Ações abertas</h3>
+
+            {actions.length === 0 ? (
+              <div className="empty">
+                Nenhuma ação foi registrada.
+              </div>
+            ) : (
+              actions.slice(0, 5).map((item) => (
+                <div className="mini-action" key={item.id}>
+                  <div>
+                    <strong>{item.action}</strong>
+                    <span>Líder: {item.leader}</span>
+                  </div>
+
+                  <Badge>
+                    {item.participants?.length || 0}/
+                    {item.criminalsMax}
+                  </Badge>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </>
     );
   }
 
-  if (!usuario) return null;
-
-  const cargo = cargoNormalizado(usuario.cargo);
-
-  const isGerente = cargo === "GERENTE";
-  const isLider = cargo === "LIDER" || cargo === "LÍDER";
-  const podeAdministrar = isGerente || isLider;
-
-  const menuMembro = [
-    ["inicio", "Início"],
-    ["acoes", "Ações"],
-    ["lavagem-membro", "Minha Lavagem"],
-    ["ausencia", "Ausência"],
-  ];
-
-  const menuAdministrativo = [
-    ["vendas", "Vendas"],
-    ["encomendas", "Encomendas"],
-    ["lavagem-cliente", "Lavagem Cliente"],
-    ["adv", "ADV"],
-    ["rebaixamento", "Rebaixamento"],
-    ["parcerias", "Parcerias"],
-    ["recrutamento", "Recrutamento"],
-    ["ranking", "Rankings"],
-    ["registros", "Registros"],
-  ];
-
-  const menuLider = [
-    ["lider", "Área do Líder"],
-  ];
-
-  function navegar(id) {
-    setPagina(id);
-    setMenuAberto(false);
-  }
-
-  return (
-    <>
-      <style>{CSS}</style>
-
-      <div className="mf-app">
-        <aside className={`mf-sidebar ${menuAberto ? "open" : ""}`}>
-          <div className="mf-brand">
-            <div className="mf-brand-mark">MF</div>
-            <div>
-              <strong>MORRO</strong>
-              <span>DO FÊNIX</span>
-            </div>
-          </div>
-
-          <div className="mf-profile">
-            <div className="mf-avatar">
-              {(usuario.nome || "M").charAt(0).toUpperCase()}
-            </div>
-
-            <div>
-              <strong>{usuario.nome}</strong>
-              <span>{usuario.cargo || "MEMBRO"}</span>
-            </div>
-          </div>
-
-          <nav className="mf-nav">
-            <div className="mf-nav-title">MEMBRO</div>
-
-            {menuMembro.map(([id, nome]) => (
-              <button
-                key={id}
-                className={pagina === id ? "active" : ""}
-                onClick={() => navegar(id)}
-              >
-                <span>{icone(id)}</span>
-                {nome}
-              </button>
-            ))}
-
-            {podeAdministrar && (
-              <>
-                <div className="mf-nav-title">ADMINISTRATIVO</div>
-
-                {menuAdministrativo.map(([id, nome]) => (
-                  <button
-                    key={id}
-                    className={pagina === id ? "active" : ""}
-                    onClick={() => navegar(id)}
-                  >
-                    <span>{icone(id)}</span>
-                    {nome}
-                  </button>
-                ))}
-              </>
-            )}
-
-            {isLider && (
-              <>
-                <div className="mf-nav-title">LIDERANÇA</div>
-
-                {menuLider.map(([id, nome]) => (
-                  <button
-                    key={id}
-                    className={pagina === id ? "active" : ""}
-                    onClick={() => navegar(id)}
-                  >
-                    <span>{icone(id)}</span>
-                    {nome}
-                  </button>
-                ))}
-              </>
-            )}
-          </nav>
-
-          <button className="mf-logout" onClick={logout}>
-            <span>↪</span>
-            Sair
-          </button>
-        </aside>
-
-        <main className="mf-main">
-          <header className="mf-topbar">
-            <button
-              className="mf-mobile-menu"
-              onClick={() => setMenuAberto((v) => !v)}
-            >
-              ☰
-            </button>
-
-            <div>
-              <span className="mf-kicker">SISTEMA INTERNO</span>
-              <h1>Morro do Fênix</h1>
-            </div>
-
-            <div className="mf-top-user">
-              <span className="mf-online"></span>
-              <div>
-                <strong>{usuario.nome}</strong>
-                <small>{usuario.cargo || "MEMBRO"}</small>
-              </div>
-            </div>
-          </header>
-
-          <div className="mf-content">
-            {pagina === "inicio" && (
-              <Inicio
-                usuario={usuario}
-                setPagina={setPagina}
-                acoesRegistradas={acoesRegistradas}
-                registros={registros}
-              />
-            )}
-
-            {pagina === "acoes" && (
-              <Acoes
-                usuario={usuario}
-                podeAdministrar={podeAdministrar}
-                acoesRegistradas={acoesRegistradas}
-                participantes={participantes}
-                registrarAcao={registrarAcao}
-                participarAcao={participarAcao}
-                sairAcao={sairAcao}
-              />
-            )}
-
-            {pagina === "vendas" && (
-              <Vendas
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("vendas", registro)
-                }
-              />
-            )}
-
-            {pagina === "encomendas" && (
-              <Encomendas
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("encomendas", registro)
-                }
-              />
-            )}
-
-            {pagina === "lavagem-cliente" && (
-              <LavagemCliente
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("lavagemCliente", registro)
-                }
-              />
-            )}
-
-            {pagina === "lavagem-membro" && (
-              <LavagemMembro
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("lavagemMembro", registro)
-                }
-              />
-            )}
-
-            {pagina === "adv" && (
-              <ADV
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("adv", registro)
-                }
-              />
-            )}
-
-            {pagina === "rebaixamento" && (
-              <Rebaixamento
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("rebaixamentos", registro)
-                }
-              />
-            )}
-
-            {pagina === "parcerias" && (
-              <Parcerias
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("parcerias", registro)
-                }
-              />
-            )}
-
-            {pagina === "recrutamento" && (
-              <Recrutamento
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("recrutamentos", registro)
-                }
-              />
-            )}
-
-            {pagina === "ausencia" && (
-              <Ausencia
-                usuario={usuario}
-                onRegister={(registro) =>
-                  adicionarRegistro("ausencias", registro)
-                }
-              />
-            )}
-
-            {pagina === "ranking" && (
-              <Rankings registros={registros} acoes={acoesRegistradas} />
-            )}
-
-            {pagina === "registros" && (
-              <Registros
-                registros={registros}
-                acoes={acoesRegistradas}
-                aba={abaRegistros}
-                setAba={setAbaRegistros}
-              />
-            )}
-
-            {pagina === "lider" && (
-              <AreaLider
-                usuario={usuario}
-                registros={registros}
-                acoes={acoesRegistradas}
-              />
-            )}
-          </div>
-
-          <footer className="mf-footer">
-            Todos os direitos reservados à{" "}
-            <a
-              href={RB_LOGS_URL}
-              target="_blank"
-              rel="noreferrer"
-            >
-              RB Logs
-            </a>
-          </footer>
-        </main>
-      </div>
-    </>
-  );
-}
-
-/* =========================================================
-   ÍCONES
-========================================================= */
-
-function icone(id) {
-  const mapa = {
-    inicio: "⌂",
-    acoes: "◆",
-    "lavagem-membro": "◉",
-    ausencia: "◷",
-    vendas: "▣",
-    encomendas: "□",
-    "lavagem-cliente": "◇",
-    adv: "!",
-    rebaixamento: "↓",
-    parcerias: "∞",
-    recrutamento: "+",
-    ranking: "★",
-    registros: "☷",
-    lider: "♛",
-  };
-
-  return mapa[id] || "•";
-}
-
-/* =========================================================
-   INÍCIO
-========================================================= */
-
-function Inicio({
-  usuario,
-  setPagina,
-  acoesRegistradas,
-  registros,
-}) {
-  const totalVendas = registros.vendas.length;
-  const totalLavagens =
-    registros.lavagemCliente.length +
-    registros.lavagemMembro.length;
-
-  return (
-    <>
-      <div className="mf-hero">
-        <div>
-          <span className="mf-kicker">PAINEL PRINCIPAL</span>
-          <h2>
-            Bem-vindo, <em>{usuario.nome}</em>
-          </h2>
-          <p>
-            Central de operações e gerenciamento do Morro do Fênix.
-          </p>
-        </div>
-
-        <div className="mf-hero-badge">
-          <span>STATUS</span>
-          <strong>ONLINE</strong>
-        </div>
-      </div>
-
-      <div className="mf-stats">
-        <Stat
-          title="Ações abertas"
-          value={acoesRegistradas.length}
-          icon="◆"
-        />
-        <Stat
-          title="Vendas registradas"
-          value={totalVendas}
-          icon="▣"
-        />
-        <Stat
-          title="Lavagens"
-          value={totalLavagens}
-          icon="◇"
-        />
-        <Stat
-          title="Seu cargo"
-          value={usuario.cargo || "MEMBRO"}
-          icon="♛"
-        />
-      </div>
-
-      <Card>
+  function renderRegistrarAcao() {
+    return (
+      <>
         <SectionTitle
-          kicker="ACESSO RÁPIDO"
-          title="Painéis principais"
-          description="Acesse diretamente as áreas disponíveis para sua função."
+          title="Registrar Ação"
+          subtitle="Cadastre uma ação para que ela apareça no painel dos membros."
         />
 
-        <div className="mf-panel-grid">
-          <QuickPanel
-            icon="◆"
-            title="Ações"
-            text="Visualize ações abertas e participe delas."
-            onClick={() => setPagina("acoes")}
-          />
-
-          <QuickPanel
-            icon="◇"
-            title="Minha Lavagem"
-            text="Registre e acompanhe suas lavagens."
-            onClick={() => setPagina("lavagem-membro")}
-          />
-
-          {String(usuario.cargo).toUpperCase() !== "MEMBRO" && (
-            <>
-              <QuickPanel
-                icon="▣"
-                title="Vendas"
-                text="Registrar e consultar vendas."
-                onClick={() => setPagina("vendas")}
-              />
-
-              <QuickPanel
-                icon="★"
-                title="Rankings"
-                text="Acompanhar desempenho da equipe."
-                onClick={() => setPagina("ranking")}
-              />
-            </>
-          )}
-        </div>
-      </Card>
-    </>
-  );
-}
-
-function Stat({ title, value, icon }) {
-  return (
-    <div className="mf-stat">
-      <div className="mf-stat-icon">{icon}</div>
-      <span>{title}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function QuickPanel({ icon, title, text, onClick }) {
-  return (
-    <button className="mf-quick" onClick={onClick}>
-      <div className="mf-quick-icon">{icon}</div>
-      <div>
-        <strong>{title}</strong>
-        <span>{text}</span>
-      </div>
-      <b>→</b>
-    </button>
-  );
-}
-
-function SectionTitle({ kicker, title, description }) {
-  return (
-    <div className="mf-section-title">
-      <div>
-        <span>{kicker}</span>
-        <h2>{title}</h2>
-        {description && <p>{description}</p>}
-      </div>
-    </div>
-  );
-}
-
-/* =========================================================
-   AÇÕES
-========================================================= */
-
-function Acoes({
-  usuario,
-  podeAdministrar,
-  acoesRegistradas,
-  participantes,
-  registrarAcao,
-  participarAcao,
-  sairAcao,
-}) {
-  const [categoria, setCategoria] = useState("Todas");
-  const [lider, setLider] = useState("");
-  const [acao, setAcao] = useState("");
-  const [erro, setErro] = useState("");
-
-  const lista = useMemo(() => {
-    return acoesRegistradas.filter(
-      (item) =>
-        categoria === "Todas" ||
-        item.categoria === categoria
-    );
-  }, [acoesRegistradas, categoria]);
-
-  function registrar(event) {
-    event.preventDefault();
-
-    if (!lider || !acao) {
-      setErro("Preencha o líder e selecione uma ação.");
-      return;
-    }
-
-    const encontrada = ACOES.find(
-      (item) => item.nome === acao
-    );
-
-    if (!encontrada) return;
-
-    registrarAcao(encontrada, lider);
-
-    setLider("");
-    setAcao("");
-    setErro("");
-  }
-
-  return (
-    <>
-      {podeAdministrar && (
-        <Card className="mf-admin-card">
-          <SectionTitle
-            kicker="GERÊNCIA / LIDERANÇA"
-            title="Registrar nova ação"
-            description="A ação só aparecerá para os membros depois de ser registrada."
-          />
-
-          <form onSubmit={registrar}>
-            <div className="mf-form-grid">
-              <Field label="Nome do líder da ação">
+        <div className="form-card">
+          <form onSubmit={registerAction}>
+            <div className="form-grid">
+              <label>
+                Nome do líder
                 <input
-                  value={lider}
-                  onChange={(e) => setLider(e.target.value)}
-                  placeholder="Digite o nome do líder"
+                  value={actionForm.leader}
+                  onChange={(e) =>
+                    setActionForm({
+                      ...actionForm,
+                      leader: e.target.value,
+                    })
+                  }
+                  placeholder="Nome do líder"
                 />
-              </Field>
+              </label>
 
-              <Field label="Selecionar ação">
+              <label>
+                Ação
                 <select
-                  value={acao}
-                  onChange={(e) => setAcao(e.target.value)}
+                  value={actionForm.action}
+                  onChange={(e) =>
+                    setActionForm({
+                      ...actionForm,
+                      action: e.target.value,
+                    })
+                  }
                 >
-                  <option value="">
-                    Selecione uma ação
-                  </option>
+                  <option value="">Selecione uma ação</option>
 
-                  <optgroup label="Ações normais">
-                    {ACOES.filter(
-                      (a) => a.categoria === "Normal"
-                    ).map((item) => (
-                      <option
-                        key={item.nome}
-                        value={item.nome}
-                      >
-                        {item.nome}
+                  <optgroup label="Ações Pequenas">
+                    {ACTIONS.filter(
+                      (a) => a.category === "Pequena"
+                    ).map((a) => (
+                      <option key={a.name} value={a.name}>
+                        {a.name}
                       </option>
                     ))}
                   </optgroup>
 
-                  <optgroup label="Ações grandes">
-                    {ACOES.filter(
-                      (a) => a.categoria === "Grande"
-                    ).map((item) => (
-                      <option
-                        key={item.nome}
-                        value={item.nome}
-                      >
-                        {item.nome}
+                  <optgroup label="Ações Grandes">
+                    {ACTIONS.filter(
+                      (a) => a.category === "Grande"
+                    ).map((a) => (
+                      <option key={a.name} value={a.name}>
+                        {a.name}
                       </option>
                     ))}
                   </optgroup>
                 </select>
-              </Field>
+              </label>
             </div>
 
-            {erro && <div className="mf-error">{erro}</div>}
+            {actionForm.action && (
+              <div className="selected-action">
+                {(() => {
+                  const a = ACTIONS.find(
+                    (x) => x.name === actionForm.action
+                  );
 
-            <Button type="submit">
+                  return (
+                    <>
+                      <div className="action-header">
+                        <div>
+                          <Badge>{a.category}</Badge>
+                          <h3>{a.name}</h3>
+                        </div>
+
+                        <strong>{money(a.value)}</strong>
+                      </div>
+
+                      <div className="info-grid">
+                        <div>
+                          <span>Bandidos</span>
+                          <strong>
+                            {a.criminalsMin}–{a.criminalsMax}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>Policiais</span>
+                          <strong>
+                            {a.policeMin}–{a.policeMax}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>Armamento</span>
+                          <strong>{a.weapon}</strong>
+                        </div>
+
+                        <div>
+                          <span>Itens</span>
+                          <strong>{a.items}</strong>
+                        </div>
+
+                        <div className="full">
+                          <span>Descrição / regras</span>
+                          <strong>{a.rules}</strong>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+
+            <button className="gold-button" type="submit">
               Registrar ação
-            </Button>
+            </button>
           </form>
-        </Card>
-      )}
-
-      <Card>
-        <div className="mf-toolbar">
-          <SectionTitle
-            kicker="OPERAÇÕES"
-            title="Ações abertas"
-            description="Somente ações que foram registradas aparecem aqui."
-          />
-
-          <select
-            className="mf-filter"
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
-          >
-            <option>Todas</option>
-            <option>Normal</option>
-            <option>Grande</option>
-          </select>
         </div>
+      </>
+    );
+  }
 
-        {lista.length === 0 ? (
-          <Empty text="Nenhuma ação foi registrada ainda." />
+  function renderAcoes() {
+    return (
+      <>
+        <SectionTitle
+          title="Ações"
+          subtitle="Somente ações registradas pelos responsáveis aparecem aqui."
+        />
+
+        {registeredActions.length === 0 ? (
+          <div className="empty large">
+            <div className="empty-icon">⚔</div>
+            <h3>Nenhuma ação aberta</h3>
+            <p>
+              Quando um gerente registrar uma ação, ela aparecerá
+              automaticamente aqui.
+            </p>
+          </div>
         ) : (
-          <div className="mf-action-grid">
-            {lista.map((item) => {
-              const membros = participantes[item.id] || [];
+          <div className="action-list">
+            {registeredActions.map((item) => {
+              const participating = (
+                item.participants || []
+              ).includes(user?.nome || "Membro");
 
-              const participando = membros.some(
-                (membro) => membro.id === usuario.id
-              );
-
-              const cheia =
-                membros.length >= item.bandidosMax;
+              const full =
+                (item.participants?.length || 0) >=
+                item.criminalsMax;
 
               return (
-                <div
-                  className={`mf-action ${
-                    item.categoria === "Grande"
-                      ? "large"
-                      : ""
-                  }`}
-                  key={item.id}
-                >
-                  <div className="mf-action-head">
+                <div className="action-card" key={item.id}>
+                  <div className="action-top">
                     <div>
-                      <span className="mf-tag">
-                        {item.categoria}
-                      </span>
-                      <h3>{item.nome}</h3>
-                    </div>
-
-                    <span className="mf-action-value">
-                      {dinheiro(item.valor)}
-                    </span>
-                  </div>
-
-                  <div className="mf-action-details">
-                    <Info
-                      label="Membros"
-                      value={`${item.bandidosMin}–${item.bandidosMax}`}
-                    />
-
-                    <Info
-                      label="Armamento"
-                      value={item.armamento}
-                    />
-
-                    <Info
-                      label="Itens"
-                      value={item.itens}
-                    />
-
-                    <Info
-                      label="Líder"
-                      value={item.lider}
-                    />
-                  </div>
-
-                  <div className="mf-description">
-                    <span>DESCRIÇÃO</span>
-                    <p>{item.descricao}</p>
-                  </div>
-
-                  <div className="mf-participants">
-                    <div className="mf-participant-head">
-                      <strong>Participantes</strong>
+                      <Badge>{item.category}</Badge>
+                      <h3>{item.action}</h3>
                       <span>
-                        {membros.length} / {item.bandidosMax}
+                        Líder: <b>{item.leader}</b>
                       </span>
                     </div>
 
-                    <div className="mf-member-list">
-                      {membros.map((membro) => (
-                        <span
-                          className="mf-member-chip"
-                          key={membro.id}
-                        >
-                          {membro.nome}
-                        </span>
-                      ))}
+                    <div className="action-value">
+                      {money(item.value)}
+                    </div>
+                  </div>
+
+                  <div className="info-grid">
+                    <div>
+                      <span>Membros</span>
+                      <strong>
+                        {item.participants?.length || 0}/
+                        {item.criminalsMax}
+                      </strong>
                     </div>
 
-                    {!participando ? (
-                      <Button
-                        disabled={cheia}
-                        onClick={() =>
-                          participarAcao(item.id)
-                        }
-                      >
-                        {cheia
-                          ? "Vagas preenchidas"
-                          : "Participar da ação"}
-                      </Button>
+                    <div>
+                      <span>Limite</span>
+                      <strong>
+                        {item.criminalsMin}–{item.criminalsMax}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>Armamento</span>
+                      <strong>{item.weapon}</strong>
+                    </div>
+
+                    <div>
+                      <span>Itens</span>
+                      <strong>{item.items}</strong>
+                    </div>
+
+                    <div className="full">
+                      <span>Descrição</span>
+                      <strong>{item.rules}</strong>
+                    </div>
+                  </div>
+
+                  <div className="participants">
+                    <span>Participantes</span>
+
+                    {item.participants?.length ? (
+                      <div className="participant-list">
+                        {item.participants.map((name) => (
+                          <Badge key={name} type="dark">
+                            {name}
+                          </Badge>
+                        ))}
+                      </div>
                     ) : (
-                      <Button
-                        variant="outline"
-                        onClick={() =>
-                          sairAcao(item.id)
-                        }
-                      >
-                        Sair da ação
-                      </Button>
+                      <small>Ninguém participou ainda.</small>
                     )}
                   </div>
+
+                  <button
+                    className={
+                      participating
+                        ? "danger-button"
+                        : "gold-button"
+                    }
+                    disabled={!participating && full}
+                    onClick={() =>
+                      toggleActionParticipant(item.id)
+                    }
+                  >
+                    {participating
+                      ? "Sair da ação"
+                      : full
+                      ? "Ação lotada"
+                      : "Participar da ação"}
+                  </button>
                 </div>
               );
             })}
           </div>
         )}
-      </Card>
-    </>
-  );
-}
-
-function Info({ label, value }) {
-  return (
-    <div>
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-/* =========================================================
-   VENDAS
-========================================================= */
-
-function Vendas({ usuario, onRegister }) {
-  const [cliente, setCliente] = useState("");
-  const [quantidade, setQuantidade] = useState(1);
-  const [valor, setValor] = useState("");
-  const [produtos, setProdutos] = useState([]);
-  const [mensagem, setMensagem] = useState("");
-
-  function alternarProduto(produto) {
-    setProdutos((lista) =>
-      lista.includes(produto)
-        ? lista.filter((p) => p !== produto)
-        : [...lista, produto]
+      </>
     );
   }
 
-  function enviar(event) {
-    event.preventDefault();
+  function renderVendas() {
+    return (
+      <>
+        <SectionTitle
+          title="Registro de Vendas"
+          subtitle="É possível selecionar vários produtos na mesma venda."
+        />
 
-    if (!produtos.length) {
-      setMensagem("Selecione pelo menos um produto.");
-      return;
-    }
+        <div className="form-card">
+          <form onSubmit={registerSale}>
+            <div className="form-grid">
+              <label>
+                Vendedor
+                <input
+                  value={saleForm.seller}
+                  onChange={(e) =>
+                    setSaleForm({
+                      ...saleForm,
+                      seller: e.target.value,
+                    })
+                  }
+                  placeholder="Nome do vendedor"
+                />
+              </label>
 
-    onRegister({
-      id: crypto.randomUUID(),
-      cliente,
-      produtos,
-      quantidade: Number(quantidade),
-      valor: Number(valor),
-      responsavel: usuario.nome,
-      data: agora(),
-    });
+              <label>
+                Quantidade
+                <input
+                  type="number"
+                  min="1"
+                  value={saleForm.quantity}
+                  onChange={(e) =>
+                    setSaleForm({
+                      ...saleForm,
+                      quantity: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </div>
 
-    setCliente("");
-    setQuantidade(1);
-    setValor("");
-    setProdutos([]);
-    setMensagem("Venda registrada com sucesso.");
-  }
+            <div className="field-title">
+              Produtos — selecione quantos quiser
+            </div>
 
-  return (
-    <Card>
-      <SectionTitle
-        kicker="REGISTRO"
-        title="Vendas"
-        description="Selecione um ou vários produtos na mesma venda."
-      />
+            {renderProductSelector(
+              PRODUCTS,
+              (value) =>
+                setSaleForm({
+                  ...saleForm,
+                  items: value,
+                }),
+              saleForm.items
+            )}
 
-      {mensagem && (
-        <div className="mf-success">{mensagem}</div>
-      )}
+            <label>
+              Observações
+              <textarea
+                value={saleForm.notes}
+                onChange={(e) =>
+                  setSaleForm({
+                    ...saleForm,
+                    notes: e.target.value,
+                  })
+                }
+                placeholder="Observações da venda"
+              />
+            </label>
 
-      <form onSubmit={enviar}>
-        <div className="mf-form-grid">
-          <Field label="Cliente">
-            <input
-              value={cliente}
-              onChange={(e) => setCliente(e.target.value)}
-              required
-              placeholder="Nome do cliente"
-            />
-          </Field>
-
-          <Field label="Quantidade">
-            <input
-              type="number"
-              min="1"
-              value={quantidade}
-              onChange={(e) =>
-                setQuantidade(e.target.value)
-              }
-            />
-          </Field>
-
-          <Field label="Valor">
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={valor}
-              onChange={(e) => setValor(e.target.value)}
-              required
-              placeholder="0,00"
-            />
-          </Field>
+            <button className="gold-button">
+              Registrar venda
+            </button>
+          </form>
         </div>
 
-        <div className="mf-product-box">
-          <span className="mf-label">
-            PRODUTOS — PODE SELECIONAR VÁRIOS
-          </span>
-
-          <div className="mf-product-grid">
-            {PRODUTOS.map((produto) => {
-              const selecionado =
-                produtos.includes(produto);
-
-              return (
-                <button
-                  type="button"
-                  key={produto}
-                  className={
-                    selecionado
-                      ? "mf-product selected"
-                      : "mf-product"
-                  }
-                  onClick={() =>
-                    alternarProduto(produto)
-                  }
-                >
-                  <span>{selecionado ? "✓" : "+"}</span>
-                  {produto}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <Button type="submit">
-          Registrar venda
-        </Button>
-      </form>
-    </Card>
-  );
-}
-
-/* =========================================================
-   ENCOMENDAS
-========================================================= */
-
-function Encomendas({ usuario, onRegister }) {
-  const [cliente, setCliente] = useState("");
-  const [dataEntrega, setDataEntrega] = useState("");
-  const [produtos, setProdutos] = useState([]);
-  const [mensagem, setMensagem] = useState("");
-
-  function alternar(produto) {
-    setProdutos((lista) =>
-      lista.includes(produto)
-        ? lista.filter((p) => p !== produto)
-        : [...lista, produto]
+        <RecordsTable
+          title="Vendas registradas"
+          data={sales}
+          empty="Nenhuma venda registrada."
+          render={(item) => (
+            <>
+              <b>{item.seller}</b>
+              <span>{item.items.join(", ")}</span>
+              <small>
+                Qtd: {item.quantity} • {item.date}
+              </small>
+            </>
+          )}
+        />
+      </>
     );
   }
 
-  function enviar(event) {
-    event.preventDefault();
+  function renderEncomendas() {
+    return (
+      <>
+        <SectionTitle
+          title="Registro de Encomendas"
+          subtitle="Selecione vários itens e defina a data de entrega."
+        />
 
-    if (!produtos.length) {
-      setMensagem("Selecione pelo menos um item.");
-      return;
-    }
+        <div className="form-card">
+          <form onSubmit={registerOrder}>
+            <div className="form-grid">
+              <label>
+                Solicitante
+                <input
+                  value={orderForm.requester}
+                  onChange={(e) =>
+                    setOrderForm({
+                      ...orderForm,
+                      requester: e.target.value,
+                    })
+                  }
+                />
+              </label>
 
-    onRegister({
-      id: crypto.randomUUID(),
-      cliente,
-      produtos,
-      dataEntrega,
-      responsavel: usuario.nome,
-      data: agora(),
-    });
+              <label>
+                Data de entrega
+                <input
+                  type="date"
+                  value={orderForm.delivery}
+                  onChange={(e) =>
+                    setOrderForm({
+                      ...orderForm,
+                      delivery: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </div>
 
-    setCliente("");
-    setDataEntrega("");
-    setProdutos([]);
-    setMensagem("Encomenda registrada.");
-  }
+            <div className="field-title">
+              Produtos — seleção múltipla
+            </div>
 
-  return (
-    <Card>
-      <SectionTitle
-        kicker="REGISTRO"
-        title="Encomendas"
-        description="Registre vários produtos e defina a data de entrega."
-      />
+            {renderProductSelector(
+              PRODUCTS,
+              (value) =>
+                setOrderForm({
+                  ...orderForm,
+                  items: value,
+                }),
+              orderForm.items
+            )}
 
-      {mensagem && (
-        <div className="mf-success">{mensagem}</div>
-      )}
+            <label>
+              Observações
+              <textarea
+                value={orderForm.notes}
+                onChange={(e) =>
+                  setOrderForm({
+                    ...orderForm,
+                    notes: e.target.value,
+                  })
+                }
+              />
+            </label>
 
-      <form onSubmit={enviar}>
-        <div className="mf-form-grid">
-          <Field label="Cliente">
-            <input
-              value={cliente}
-              onChange={(e) => setCliente(e.target.value)}
-              required
-              placeholder="Nome do cliente"
-            />
-          </Field>
-
-          <Field label="Data de entrega">
-            <input
-              type="date"
-              value={dataEntrega}
-              onChange={(e) =>
-                setDataEntrega(e.target.value)
-              }
-              required
-            />
-          </Field>
+            <button className="gold-button">
+              Registrar encomenda
+            </button>
+          </form>
         </div>
 
-        <div className="mf-product-box">
-          <span className="mf-label">
-            ITENS — SELECIONE VÁRIOS
-          </span>
+        <RecordsTable
+          title="Encomendas"
+          data={orders}
+          empty="Nenhuma encomenda registrada."
+          render={(item) => (
+            <>
+              <b>{item.requester}</b>
+              <span>{item.items.join(", ")}</span>
+              <small>
+                Entrega: {item.delivery} • Registrada: {item.date}
+              </small>
+            </>
+          )}
+        />
+      </>
+    );
+  }
 
-          <div className="mf-product-grid">
-            {PRODUTOS.map((produto) => (
+  function renderAdv() {
+    return (
+      <>
+        <SectionTitle
+          title="ADV / Rebaixamento"
+          subtitle="É possível selecionar ADV 1, ADV 2 e ADV 3."
+        />
+
+        <div className="form-card">
+          <form onSubmit={registerAdv}>
+            <label>
+              Membro
+              <input
+                value={advForm.member}
+                onChange={(e) =>
+                  setAdvForm({
+                    ...advForm,
+                    member: e.target.value,
+                  })
+                }
+                placeholder="Nome ou ID do membro"
+              />
+            </label>
+
+            <div className="field-title">Níveis</div>
+
+            <div className="adv-grid">
+              {["ADV 1", "ADV 2", "ADV 3"].map((level) => {
+                const selected =
+                  advForm.levels.includes(level);
+
+                return (
+                  <button
+                    type="button"
+                    key={level}
+                    className={`adv-button ${
+                      selected ? "selected" : ""
+                    }`}
+                    onClick={() =>
+                      setAdvForm({
+                        ...advForm,
+                        levels: selected
+                          ? advForm.levels.filter(
+                              (x) => x !== level
+                            )
+                          : [...advForm.levels, level],
+                      })
+                    }
+                  >
+                    {selected ? "✓ " : ""}
+                    {level}
+                  </button>
+                );
+              })}
+            </div>
+
+            <label>
+              Motivo
+              <textarea
+                value={advForm.reason}
+                onChange={(e) =>
+                  setAdvForm({
+                    ...advForm,
+                    reason: e.target.value,
+                  })
+                }
+                placeholder="Motivo do ADV/rebaixamento"
+              />
+            </label>
+
+            <button className="gold-button">
+              Registrar ADV
+            </button>
+          </form>
+        </div>
+
+        <RecordsTable
+          title="Registros de ADV"
+          data={adv}
+          empty="Nenhum ADV registrado."
+          render={(item) => (
+            <>
+              <b>{item.member}</b>
+              <span>{item.levels.join(", ")}</span>
+              <small>
+                {item.reason || "Sem motivo informado"} •{" "}
+                {item.date}
+              </small>
+            </>
+          )}
+        />
+      </>
+    );
+  }
+
+  function renderLavagem() {
+    return (
+      <>
+        <SectionTitle
+          title="Lavagem Cliente"
+          subtitle="Registre parceria, valor, percentual da facção e comprovante."
+        />
+
+        <div className="form-card">
+          <form onSubmit={registerWash}>
+            <div className="form-grid">
+              <label>
+                Cliente
+                <input
+                  value={washForm.client}
+                  onChange={(e) =>
+                    setWashForm({
+                      ...washForm,
+                      client: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label>
+                ID
+                <input
+                  value={washForm.id}
+                  onChange={(e) =>
+                    setWashForm({
+                      ...washForm,
+                      id: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label>
+                Valor da lavagem
+                <input
+                  value={washForm.value}
+                  onChange={(e) =>
+                    setWashForm({
+                      ...washForm,
+                      value: e.target.value,
+                    })
+                  }
+                  placeholder="100000"
+                />
+              </label>
+
+              <label>
+                Responsável
+                <input
+                  value={washForm.responsible}
+                  onChange={(e) =>
+                    setWashForm({
+                      ...washForm,
+                      responsible: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="field-title">
+              A lavagem possui parceria?
+            </div>
+
+            <div className="choice-grid">
               <button
                 type="button"
-                key={produto}
                 className={
-                  produtos.includes(produto)
-                    ? "mf-product selected"
-                    : "mf-product"
+                  washForm.partnership === "sim"
+                    ? "choice selected"
+                    : "choice"
                 }
-                onClick={() => alternar(produto)}
+                onClick={() =>
+                  setWashForm({
+                    ...washForm,
+                    partnership: "sim",
+                  })
+                }
               >
-                <span>
-                  {produtos.includes(produto)
-                    ? "✓"
-                    : "+"}
-                </span>
-                {produto}
+                SIM — 20% FAC
               </button>
-            ))}
-          </div>
+
+              <button
+                type="button"
+                className={
+                  washForm.partnership === "nao"
+                    ? "choice selected"
+                    : "choice"
+                }
+                onClick={() =>
+                  setWashForm({
+                    ...washForm,
+                    partnership: "nao",
+                  })
+                }
+              >
+                NÃO — 30% FAC
+              </button>
+            </div>
+
+            {washForm.value && (
+              <div className="wash-preview">
+                {(() => {
+                  const value = Number(
+                    String(washForm.value)
+                      .replace(/\./g, "")
+                      .replace(",", ".")
+                  );
+
+                  const percent =
+                    washForm.partnership === "sim" ? 20 : 30;
+
+                  const fac = value * (percent / 100);
+
+                  return (
+                    <>
+                      <div>
+                        <span>Percentual FAC</span>
+                        <strong>{percent}%</strong>
+                      </div>
+
+                      <div>
+                        <span>Valor FAC</span>
+                        <strong>{money(fac)}</strong>
+                      </div>
+
+                      <div>
+                        <span>Valor restante</span>
+                        <strong>{money(value - fac)}</strong>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+
+            <label>
+              Comprovante / print
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setWashForm({
+                    ...washForm,
+                    proof:
+                      e.target.files?.[0]?.name || "",
+                  })
+                }
+              />
+              {washForm.proof && (
+                <small className="file-name">
+                  Arquivo: {washForm.proof}
+                </small>
+              )}
+            </label>
+
+            <button className="gold-button">
+              Registrar lavagem
+            </button>
+          </form>
         </div>
 
-        <Button type="submit">
-          Registrar encomenda
-        </Button>
-      </form>
-    </Card>
-  );
-}
+        <div className="records-list">
+          <h3>Registros de Lavagem</h3>
 
-/* =========================================================
-   LAVAGEM CLIENTE
-========================================================= */
+          {wash.length === 0 ? (
+            <div className="empty">
+              Nenhuma lavagem registrada.
+            </div>
+          ) : (
+            wash.map((item) => (
+              <div className="wash-record" key={item.id}>
+                <div className="record-head">
+                  <div>
+                    <Badge>LAVAGEM CLIENTE</Badge>
+                    <h3>{item.client}</h3>
+                  </div>
 
-function LavagemCliente({ usuario, onRegister }) {
-  const [cliente, setCliente] = useState("");
-  const [idCliente, setIdCliente] = useState("");
-  const [valor, setValor] = useState("");
-  const [tipo, setTipo] = useState("parceria");
-  const [comprovante, setComprovante] = useState(null);
-  const [mensagem, setMensagem] = useState("");
+                  <Badge
+                    type={
+                      item.status === "PENDENTE"
+                        ? "warning"
+                        : "gold"
+                    }
+                  >
+                    {item.status}
+                  </Badge>
+                </div>
 
-  const percentual = tipo === "parceria" ? 0.2 : 0.3;
+                <div className="wash-data">
+                  <div>
+                    <span>ID</span>
+                    <b>{item.clientId || "-"}</b>
+                  </div>
 
-  const total = Number(valor || 0);
-  const valorFac = total * percentual;
-  const restante = total - valorFac;
+                  <div>
+                    <span>Valor</span>
+                    <b>{money(item.value)}</b>
+                  </div>
 
-  function registrar(event) {
-    event.preventDefault();
+                  <div>
+                    <span>Parceria</span>
+                    <b>
+                      {item.partnership ? "SIM" : "NÃO"}
+                    </b>
+                  </div>
 
-    if (!comprovante) {
-      setMensagem(
-        "É obrigatório anexar o comprovante da lavagem."
-      );
-      return;
-    }
+                  <div>
+                    <span>Percentual FAC</span>
+                    <b>{item.percentage}%</b>
+                  </div>
 
-    onRegister({
-      id: crypto.randomUUID(),
-      cliente,
-      idCliente,
-      valor: total,
-      parceria: tipo === "parceria",
-      percentual: percentual * 100,
-      valorFac,
-      restante,
-      comprovante: comprovante.name,
-      responsavel: usuario.nome,
-      data: agora(),
-      status: "PENDENTE",
-    });
+                  <div>
+                    <span>Valor FAC</span>
+                    <b>{money(item.facValue)}</b>
+                  </div>
 
-    setCliente("");
-    setIdCliente("");
-    setValor("");
-    setComprovante(null);
-    setMensagem("Lavagem registrada.");
-  }
+                  <div>
+                    <span>Valor restante</span>
+                    <b>{money(item.remaining)}</b>
+                  </div>
 
-  return (
-    <Card>
-      <SectionTitle
-        kicker="FINANCEIRO"
-        title="Lavagem Cliente"
-        description="Registre o valor, o tipo de parceria e o comprovante."
-      />
+                  <div>
+                    <span>Responsável</span>
+                    <b>{item.responsible}</b>
+                  </div>
 
-      {mensagem && (
-        <div className="mf-success">{mensagem}</div>
-      )}
+                  <div>
+                    <span>Data</span>
+                    <b>{item.date}</b>
+                  </div>
+                </div>
 
-      <form onSubmit={registrar}>
-        <div className="mf-form-grid">
-          <Field label="Cliente">
-            <input
-              value={cliente}
-              onChange={(e) => setCliente(e.target.value)}
-              required
-            />
-          </Field>
-
-          <Field label="ID do cliente">
-            <input
-              value={idCliente}
-              onChange={(e) =>
-                setIdCliente(e.target.value)
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Valor da lavagem">
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={valor}
-              onChange={(e) => setValor(e.target.value)}
-              required
-            />
-          </Field>
-
-          <Field label="Tipo de lavagem">
-            <select
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
-            >
-              <option value="parceria">
-                Com parceria — 20% FAC
-              </option>
-
-              <option value="sem-parceria">
-                Sem parceria — 30% FAC
-              </option>
-            </select>
-          </Field>
-
-          <Field label="Comprovante / print">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setComprovante(e.target.files?.[0] || null)
-              }
-              required
-            />
-          </Field>
+                <div className="proof">
+                  <span>Comprovante</span>
+                  <b>
+                    {item.proof
+                      ? `📎 ${item.proof}`
+                      : "Nenhum comprovante informado"}
+                  </b>
+                </div>
+              </div>
+            ))
+          )}
         </div>
-
-        <div className="mf-wash-summary">
-          <div>
-            <span>Valor total</span>
-            <strong>{dinheiro(total)}</strong>
-          </div>
-
-          <div>
-            <span>Valor para FAC</span>
-            <strong>{dinheiro(valorFac)}</strong>
-            <small>{percentual * 100}%</small>
-          </div>
-
-          <div>
-            <span>Valor restante</span>
-            <strong>{dinheiro(restante)}</strong>
-          </div>
-        </div>
-
-        <div className="mf-preview">
-          <div>
-            <span>CLIENTE</span>
-            <strong>{cliente || "—"}</strong>
-          </div>
-
-          <div>
-            <span>PARCERIA</span>
-            <strong>
-              {tipo === "parceria" ? "SIM" : "NÃO"}
-            </strong>
-          </div>
-
-          <div>
-            <span>RESPONSÁVEL</span>
-            <strong>{usuario.nome}</strong>
-          </div>
-
-          <div>
-            <span>STATUS</span>
-            <strong>PENDENTE</strong>
-          </div>
-        </div>
-
-        <Button type="submit">
-          Registrar lavagem
-        </Button>
-      </form>
-    </Card>
-  );
-}
-
-/* =========================================================
-   LAVAGEM MEMBRO
-========================================================= */
-
-function LavagemMembro({ usuario, onRegister }) {
-  return (
-    <div>
-      <LavagemCliente
-        usuario={usuario}
-        onRegister={onRegister}
-      />
-    </div>
-  );
-}
-
-/* =========================================================
-   ADV
-========================================================= */
-
-function ADV({ usuario, onRegister }) {
-  const [membro, setMembro] = useState("");
-  const [advs, setAdvs] = useState([]);
-  const [mensagem, setMensagem] = useState("");
-
-  function alternar(numero) {
-    setAdvs((lista) =>
-      lista.includes(numero)
-        ? lista.filter((item) => item !== numero)
-        : [...lista, numero]
+      </>
     );
   }
 
-  function registrar(event) {
-    event.preventDefault();
-
-    if (!membro || !advs.length) {
-      setMensagem(
-        "Informe o membro e selecione pelo menos um ADV."
-      );
-      return;
-    }
-
-    onRegister({
-      id: crypto.randomUUID(),
-      membro,
-      advs,
-      responsavel: usuario.nome,
-      data: agora(),
-    });
-
-    setMembro("");
-    setAdvs([]);
-    setMensagem("ADV registrado.");
-  }
-
-  return (
-    <Card>
-      <SectionTitle
-        kicker="DISCIPLINAR"
-        title="ADV"
-        description="É possível selecionar ADV 1, 2 e 3 simultaneamente."
-      />
-
-      {mensagem && (
-        <div className="mf-success">{mensagem}</div>
-      )}
-
-      <form onSubmit={registrar}>
-        <Field label="Membro">
-          <input
-            value={membro}
-            onChange={(e) => setMembro(e.target.value)}
-            placeholder="Nome do membro"
-            required
-          />
-        </Field>
-
-        <div className="mf-select-grid">
-          {[1, 2, 3].map((numero) => (
-            <button
-              type="button"
-              key={numero}
-              className={
-                advs.includes(numero)
-                  ? "mf-select-card selected"
-                  : "mf-select-card"
-              }
-              onClick={() => alternar(numero)}
-            >
-              <span>
-                {advs.includes(numero) ? "✓" : "0" + numero}
-              </span>
-
-              <strong>ADV {numero}</strong>
-
-              <small>
-                {advs.includes(numero)
-                  ? "Selecionado"
-                  : "Selecionar"}
-              </small>
-            </button>
-          ))}
-        </div>
-
-        <Button type="submit">
-          Registrar ADV
-        </Button>
-      </form>
-    </Card>
-  );
-}
-
-/* =========================================================
-   REBAIXAMENTO
-========================================================= */
-
-function Rebaixamento({ usuario, onRegister }) {
-  const [membro, setMembro] = useState("");
-  const [cargoAtual, setCargoAtual] = useState("");
-  const [novoCargo, setNovoCargo] = useState("");
-  const [motivo, setMotivo] = useState("");
-
-  function enviar(e) {
-    e.preventDefault();
-
-    onRegister({
-      id: crypto.randomUUID(),
-      membro,
-      cargoAtual,
-      novoCargo,
-      motivo,
-      responsavel: usuario.nome,
-      data: agora(),
-    });
-
-    setMembro("");
-    setCargoAtual("");
-    setNovoCargo("");
-    setMotivo("");
-  }
-
-  return (
-    <Card>
-      <SectionTitle
-        kicker="ADMINISTRAÇÃO"
-        title="Rebaixamento"
-        description="Registre alterações de cargo dos membros."
-      />
-
-      <form onSubmit={enviar}>
-        <div className="mf-form-grid">
-          <Field label="Membro">
-            <input
-              value={membro}
-              onChange={(e) => setMembro(e.target.value)}
-              required
-            />
-          </Field>
-
-          <Field label="Cargo atual">
-            <input
-              value={cargoAtual}
-              onChange={(e) =>
-                setCargoAtual(e.target.value)
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Novo cargo">
-            <input
-              value={novoCargo}
-              onChange={(e) =>
-                setNovoCargo(e.target.value)
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Motivo">
-            <input
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              required
-            />
-          </Field>
-        </div>
-
-        <Button type="submit">
-          Registrar rebaixamento
-        </Button>
-      </form>
-    </Card>
-  );
-}
-
-/* =========================================================
-   PARCERIAS
-========================================================= */
-
-function Parcerias({ usuario, onRegister }) {
-  const [organizacao, setOrganizacao] = useState("");
-  const [responsavel, setResponsavel] = useState("");
-  const [contato, setContato] = useState("");
-  const [observacao, setObservacao] = useState("");
-
-  function enviar(e) {
-    e.preventDefault();
-
-    onRegister({
-      id: crypto.randomUUID(),
-      organizacao,
-      responsavel,
-      contato,
-      observacao,
-      responsavelSistema: usuario.nome,
-      data: agora(),
-    });
-
-    setOrganizacao("");
-    setResponsavel("");
-    setContato("");
-    setObservacao("");
-  }
-
-  return (
-    <Card>
-      <SectionTitle
-        kicker="RELACIONAMENTO"
-        title="Parcerias"
-        description="Gerencie os registros de parceria."
-      />
-
-      <form onSubmit={enviar}>
-        <div className="mf-form-grid">
-          <Field label="Organização">
-            <input
-              value={organizacao}
-              onChange={(e) =>
-                setOrganizacao(e.target.value)
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Responsável">
-            <input
-              value={responsavel}
-              onChange={(e) =>
-                setResponsavel(e.target.value)
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Contato">
-            <input
-              value={contato}
-              onChange={(e) => setContato(e.target.value)}
-            />
-          </Field>
-
-          <Field label="Observação">
-            <input
-              value={observacao}
-              onChange={(e) =>
-                setObservacao(e.target.value)
-              }
-            />
-          </Field>
-        </div>
-
-        <Button type="submit">
-          Registrar parceria
-        </Button>
-      </form>
-    </Card>
-  );
-}
-
-/* =========================================================
-   RECRUTAMENTO
-========================================================= */
-
-function Recrutamento({ usuario, onRegister }) {
-  const [nome, setNome] = useState("");
-  const [id, setId] = useState("");
-  const [discord, setDiscord] = useState("");
-
-  function enviar(e) {
-    e.preventDefault();
-
-    onRegister({
-      id: crypto.randomUUID(),
-      nome,
-      id,
-      discord,
-      recrutador: usuario.nome,
-      data: agora(),
-    });
-
-    setNome("");
-    setId("");
-    setDiscord("");
-  }
-
-  return (
-    <Card>
-      <SectionTitle
-        kicker="MEMBROS"
-        title="Recrutamento"
-        description="Registre novos membros e acompanhe quem realizou o recrutamento."
-      />
-
-      <form onSubmit={enviar}>
-        <div className="mf-form-grid">
-          <Field label="Nome">
-            <input
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              required
-            />
-          </Field>
-
-          <Field label="ID">
-            <input
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              required
-            />
-          </Field>
-
-          <Field label="ID Discord">
-            <input
-              value={discord}
-              onChange={(e) =>
-                setDiscord(e.target.value)
-              }
-            />
-          </Field>
-        </div>
-
-        <Button type="submit">
-          Registrar recrutamento
-        </Button>
-      </form>
-    </Card>
-  );
-}
-
-/* =========================================================
-   AUSÊNCIA
-========================================================= */
-
-function Ausencia({ usuario, onRegister }) {
-  const [dataInicio, setDataInicio] = useState("");
-  const [dataFim, setDataFim] = useState("");
-  const [motivo, setMotivo] = useState("");
-
-  function enviar(e) {
-    e.preventDefault();
-
-    onRegister({
-      id: crypto.randomUUID(),
-      membro: usuario.nome,
-      dataInicio,
-      dataFim,
-      motivo,
-      dataRegistro: agora(),
-    });
-
-    setDataInicio("");
-    setDataFim("");
-    setMotivo("");
-  }
-
-  return (
-    <Card>
-      <SectionTitle
-        kicker="MEMBROS"
-        title="Registrar ausência"
-        description="Informe o período em que ficará ausente."
-      />
-
-      <form onSubmit={enviar}>
-        <div className="mf-form-grid">
-          <Field label="Início">
-            <input
-              type="date"
-              value={dataInicio}
-              onChange={(e) =>
-                setDataInicio(e.target.value)
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Fim">
-            <input
-              type="date"
-              value={dataFim}
-              onChange={(e) =>
-                setDataFim(e.target.value)
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Motivo">
-            <input
-              value={motivo}
-              onChange={(e) =>
-                setMotivo(e.target.value)
-              }
-              required
-              placeholder="Informe o motivo"
-            />
-          </Field>
-        </div>
-
-        <Button type="submit">
-          Registrar ausência
-        </Button>
-      </form>
-    </Card>
-  );
-}
-
-/* =========================================================
-   RANKINGS
-========================================================= */
-
-function Rankings({ registros, acoes }) {
-  const rankingRecrutamento = contar(
-    registros.recrutamentos,
-    "recrutador"
-  );
-
-  const rankingVendas = contar(
-    registros.vendas,
-    "responsavel"
-  );
-
-  const rankingAcoes = contar(
-    acoes,
-    "lider"
-  );
-
-  const rankingLavagem = [
-    ...registros.lavagemCliente,
-    ...registros.lavagemMembro,
-  ];
-
-  const rankingLavagemFinal = contar(
-    rankingLavagem,
-    "responsavel"
-  );
-
-  return (
-    <div>
-      <SectionTitle
-        kicker="DESEMPENHO"
-        title="Rankings"
-        description="Desempenho separado por categoria."
-      />
-
-      <div className="mf-ranking-grid">
-        <RankingCard
+  function renderRecrutamento() {
+    return (
+      <>
+        <SectionTitle
           title="Recrutamento"
-          dados={rankingRecrutamento}
+          subtitle="Registro de novos membros."
         />
 
-        <RankingCard
-          title="Vendas"
-          dados={rankingVendas}
+        <div className="form-card">
+          <form onSubmit={registerRecruitment}>
+            <div className="form-grid">
+              <label>
+                Nome
+                <input
+                  value={recruitForm.name}
+                  onChange={(e) =>
+                    setRecruitForm({
+                      ...recruitForm,
+                      name: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label>
+                ID
+                <input
+                  value={recruitForm.id}
+                  onChange={(e) =>
+                    setRecruitForm({
+                      ...recruitForm,
+                      id: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label>
+                Discord
+                <input
+                  value={recruitForm.discord}
+                  onChange={(e) =>
+                    setRecruitForm({
+                      ...recruitForm,
+                      discord: e.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label>
+                Responsável
+                <input
+                  value={recruitForm.responsible}
+                  onChange={(e) =>
+                    setRecruitForm({
+                      ...recruitForm,
+                      responsible: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </div>
+
+            <button className="gold-button">
+              Registrar recrutamento
+            </button>
+          </form>
+        </div>
+
+        <RecordsTable
+          title="Recrutamentos"
+          data={recruitments}
+          empty="Nenhum recrutamento registrado."
+          render={(item) => (
+            <>
+              <b>{item.name}</b>
+              <span>
+                ID: {item.memberId} • Discord:{" "}
+                {item.discord || "-"}
+              </span>
+              <small>
+                Responsável: {item.responsible} • {item.date}
+              </small>
+            </>
+          )}
+        />
+      </>
+    );
+  }
+
+  function renderRegistros() {
+    return (
+      <>
+        <SectionTitle
+          title="Registros"
+          subtitle="Histórico geral das atividades."
         />
 
-        <RankingCard
-          title="Ações"
-          dados={rankingAcoes}
+        <div className="records-list">
+          {records.length === 0 ? (
+            <div className="empty large">
+              Nenhum registro disponível.
+            </div>
+          ) : (
+            records.map((item) => (
+              <div className="record-row" key={item.id}>
+                <div>
+                  <Badge>{item.type}</Badge>
+                  <h3>
+                    {item.action ||
+                      item.client ||
+                      item.member ||
+                      item.name ||
+                      item.seller ||
+                      item.requester ||
+                      "Registro"}
+                  </h3>
+                </div>
+
+                <div>
+                  <span>Responsável</span>
+                  <b>{item.author || item.responsible}</b>
+                </div>
+
+                <div>
+                  <span>Data</span>
+                  <b>{item.date}</b>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </>
+    );
+  }
+
+  function renderMembros() {
+    return (
+      <>
+        <SectionTitle
+          title="Área dos Membros"
+          subtitle="Participação em ações e registro de ausência."
         />
 
-        <RankingCard
-          title="Lavagem"
-          dados={rankingLavagemFinal}
-        />
-      </div>
-    </div>
-  );
-}
+        <div className="member-hero">
+          <div className="avatar">
+            {(user?.nome || "M").charAt(0).toUpperCase()}
+          </div>
 
-function contar(lista, campo) {
-  const mapa = {};
+          <div>
+            <span>MEMBRO</span>
+            <h2>{user?.nome || "Membro"}</h2>
+            <p>
+              {user?.id ? `ID: ${user.id}` : "Área do membro"}
+            </p>
+          </div>
+        </div>
 
-  lista.forEach((item) => {
-    const nome = item?.[campo];
+        <div className="dashboard-grid">
+          <div className="panel-card">
+            <h3>Minhas ações</h3>
 
-    if (!nome) return;
+            {actions.filter((a) =>
+              (a.participants || []).includes(
+                user?.nome || "Membro"
+              )
+            ).length === 0 ? (
+              <div className="empty">
+                Você ainda não está participando de nenhuma ação.
+              </div>
+            ) : (
+              actions
+                .filter((a) =>
+                  (a.participants || []).includes(
+                    user?.nome || "Membro"
+                  )
+                )
+                .map((a) => (
+                  <div className="activity" key={a.id}>
+                    <div>
+                      <strong>{a.action}</strong>
+                      <span>Líder: {a.leader}</span>
+                    </div>
 
-    mapa[nome] = (mapa[nome] || 0) + 1;
-  });
+                    <Badge>
+                      {a.participants.length}/
+                      {a.criminalsMax}
+                    </Badge>
+                  </div>
+                ))
+            )}
+          </div>
 
-  return Object.entries(mapa)
-    .map(([nome, quantidade]) => ({
-      nome,
-      quantidade,
-    }))
-    .sort((a, b) => b.quantidade - a.quantidade);
-}
+          <div className="panel-card">
+            <h3>Registrar ausência</h3>
 
-function RankingCard({ title, dados }) {
-  return (
-    <Card className="mf-ranking-card">
-      <div className="mf-ranking-title">
-        <span>★</span>
-        <h3>Ranking de {title}</h3>
-      </div>
+            <form onSubmit={registerAbsence}>
+              <label>
+                Data
+                <input
+                  type="date"
+                  value={absenceForm.date}
+                  onChange={(e) =>
+                    setAbsenceForm({
+                      ...absenceForm,
+                      date: e.target.value,
+                    })
+                  }
+                />
+              </label>
 
-      {dados.length === 0 ? (
-        <Empty text="Nenhum registro ainda." />
-      ) : (
-        <div className="mf-ranking-list">
-          {dados.slice(0, 10).map((item, index) => (
-            <div className="mf-ranking-item" key={item.nome}>
-              <strong>{index + 1}º</strong>
+              <label>
+                Motivo
+                <textarea
+                  value={absenceForm.reason}
+                  onChange={(e) =>
+                    setAbsenceForm({
+                      ...absenceForm,
+                      reason: e.target.value,
+                    })
+                  }
+                />
+              </label>
 
-              <div>
-                <span>{item.nome}</span>
+              <button className="gold-button">
+                Registrar ausência
+              </button>
+            </form>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  function renderRankings() {
+    const ranking = (title, data, suffix = "") => (
+      <div className="ranking-card">
+        <div className="ranking-title">
+          <span>★</span>
+          <h3>{title}</h3>
+        </div>
+
+        {data.length === 0 ? (
+          <div className="empty">
+            Ainda não existem dados suficientes.
+          </div>
+        ) : (
+          data.slice(0, 10).map((item, index) => (
+            <div className="ranking-row" key={item.name}>
+              <div className="position">
+                #{index + 1}
+              </div>
+
+              <div className="rank-name">
+                <strong>{item.name}</strong>
                 <small>
-                  {item.quantidade} registro
-                  {item.quantidade === 1 ? "" : "s"}
+                  {item.points} {suffix}
                 </small>
               </div>
 
-              <b>{item.quantidade}</b>
-            </div>
-          ))}
-        </div>
-      )}
-    </Card>
-  );
-}
-
-/* =========================================================
-   REGISTROS
-========================================================= */
-
-function Registros({
-  registros,
-  acoes,
-  aba,
-  setAba,
-}) {
-  const abas = [
-    ["vendas", "Vendas"],
-    ["lavagemCliente", "Lavagem Cliente"],
-    ["lavagemMembro", "Lavagem Membro"],
-    ["encomendas", "Encomendas"],
-    ["adv", "ADV"],
-    ["rebaixamentos", "Rebaixamentos"],
-    ["parcerias", "Parcerias"],
-    ["recrutamentos", "Recrutamento"],
-    ["acoes", "Ações"],
-    ["ausencias", "Ausências"],
-  ];
-
-  return (
-    <div>
-      <SectionTitle
-        kicker="HISTÓRICO"
-        title="Registros"
-        description="Cada categoria possui sua própria aba."
-      />
-
-      <div className="mf-tabs">
-        {abas.map(([id, nome]) => (
-          <button
-            key={id}
-            className={aba === id ? "active" : ""}
-            onClick={() => setAba(id)}
-          >
-            {nome}
-          </button>
-        ))}
-      </div>
-
-      {aba === "acoes" ? (
-        <ListaAcoes registros={acoes} />
-      ) : (
-        <ListaRegistros
-          tipo={aba}
-          lista={registros[aba] || []}
-        />
-      )}
-    </div>
-  );
-}
-
-function ListaRegistros({ tipo, lista }) {
-  if (!lista.length) {
-    return <Empty text="Nenhum registro nesta categoria." />;
-  }
-
-  return (
-    <div className="mf-records">
-      {lista.map((item) => (
-        <div className="mf-record" key={item.id}>
-          <div className="mf-record-main">
-            <span className="mf-record-type">
-              {nomeTipoRegistro(tipo)}
-            </span>
-
-            <h3>
-              {item.cliente ||
-                item.membro ||
-                item.nome ||
-                item.organizacao ||
-                "Registro"}
-            </h3>
-
-            <p>
-              Responsável:{" "}
-              {item.responsavel ||
-                item.recrutador ||
-                item.responsavelSistema ||
-                "—"}
-            </p>
-          </div>
-
-          <div className="mf-record-side">
-            <strong>{item.data || item.dataRegistro}</strong>
-
-            {item.valor !== undefined && (
-              <span>{dinheiro(item.valor)}</span>
-            )}
-
-            {item.status && (
-              <span className="mf-status">
-                {item.status}
-              </span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ListaAcoes({ registros }) {
-  if (!registros.length) {
-    return <Empty text="Nenhuma ação foi registrada." />;
-  }
-
-  return (
-    <div className="mf-records">
-      {registros.map((item) => (
-        <div className="mf-record" key={item.id}>
-          <div className="mf-record-main">
-            <span className="mf-record-type">
-              AÇÃO {item.categoria}
-            </span>
-
-            <h3>{item.nome}</h3>
-
-            <p>
-              Líder: {item.lider}
-            </p>
-          </div>
-
-          <div className="mf-record-side">
-            <strong>{item.data}</strong>
-            <span>{dinheiro(item.valor)}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function nomeTipoRegistro(tipo) {
-  const nomes = {
-    vendas: "VENDA",
-    lavagemCliente: "LAVAGEM CLIENTE",
-    lavagemMembro: "LAVAGEM MEMBRO",
-    encomendas: "ENCOMENDA",
-    adv: "ADV",
-    rebaixamentos: "REBAIXAMENTO",
-    parcerias: "PARCERIA",
-    recrutamentos: "RECRUTAMENTO",
-    ausencias: "AUSÊNCIA",
-  };
-
-  return nomes[tipo] || "REGISTRO";
-}
-
-/* =========================================================
-   ÁREA DO LÍDER
-========================================================= */
-
-function AreaLider({ usuario, registros, acoes }) {
-  return (
-    <div>
-      <SectionTitle
-        kicker="LIDERANÇA"
-        title="Área do Líder"
-        description="Acompanhamento das atividades e registros da equipe."
-      />
-
-      <div className="mf-stats">
-        <Stat
-          title="Ações"
-          value={acoes.length}
-          icon="◆"
-        />
-
-        <Stat
-          title="Vendas"
-          value={registros.vendas.length}
-          icon="▣"
-        />
-
-        <Stat
-          title="Lavagens"
-          value={
-            registros.lavagemCliente.length +
-            registros.lavagemMembro.length
-          }
-          icon="◇"
-        />
-
-        <Stat
-          title="Recrutamentos"
-          value={registros.recrutamentos.length}
-          icon="+"
-        />
-      </div>
-
-      <Card>
-        <SectionTitle
-          kicker="LOGS"
-          title="Atividade recente"
-        />
-
-        <div className="mf-records">
-          {[
-            ...acoes.map((item) => ({
-              tipo: "AÇÃO",
-              nome: item.nome,
-              responsavel: item.lider,
-              data: item.data,
-            })),
-            ...registros.vendas.map((item) => ({
-              tipo: "VENDA",
-              nome: item.cliente,
-              responsavel: item.responsavel,
-              data: item.data,
-            })),
-            ...registros.recrutamentos.map((item) => ({
-              tipo: "RECRUTAMENTO",
-              nome: item.nome,
-              responsavel: item.recrutador,
-              data: item.data,
-            })),
-          ]
-            .slice(0, 20)
-            .map((item, index) => (
-              <div className="mf-record" key={index}>
-                <div className="mf-record-main">
-                  <span className="mf-record-type">
-                    {item.tipo}
-                  </span>
-                  <h3>{item.nome}</h3>
-                  <p>
-                    Responsável: {item.responsavel}
-                  </p>
-                </div>
-
-                <div className="mf-record-side">
-                  <strong>{item.data}</strong>
-                </div>
+              <div className="points">
+                {item.points}
               </div>
-            ))}
+            </div>
+          ))
+        )}
+      </div>
+    );
+
+    return (
+      <>
+        <SectionTitle
+          title="Rankings"
+          subtitle="Desempenho por categoria."
+        />
+
+        <div className="ranking-grid">
+          {ranking(
+            "Ranking de Recrutamento",
+            rankings.recruitment,
+            "recrutamentos"
+          )}
+
+          {ranking(
+            "Ranking de Vendas",
+            rankings.sales,
+            "vendas"
+          )}
+
+          {ranking(
+            "Ranking de Ações",
+            rankings.actions,
+            "ações"
+          )}
+
+          {ranking(
+            "Ranking de Lavagem",
+            rankings.wash,
+            "lavagens"
+          )}
         </div>
-      </Card>
+      </>
+    );
+  }
+
+  function renderLider() {
+    return (
+      <>
+        <SectionTitle
+          title="Painel do Líder"
+          subtitle="Acompanhamento das atividades da equipe."
+        />
+
+        <div className="stats-grid">
+          <div className="stat-card">
+            <span>Ações abertas</span>
+            <strong>{actions.length}</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Participantes</span>
+            <strong>
+              {actions.reduce(
+                (total, a) =>
+                  total + (a.participants?.length || 0),
+                0
+              )}
+            </strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Vendas</span>
+            <strong>{sales.length}</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Lavagens</span>
+            <strong>{wash.length}</strong>
+          </div>
+        </div>
+
+        <div className="panel-card">
+          <h3>Logs da equipe</h3>
+
+          {records.length === 0 ? (
+            <div className="empty">
+              Nenhum log disponível.
+            </div>
+          ) : (
+            records.slice(0, 15).map((item) => (
+              <div className="activity" key={item.id}>
+                <div>
+                  <strong>{item.type}</strong>
+                  <span>
+                    {item.author || item.responsible || "Sistema"}
+                  </span>
+                </div>
+
+                <small>{item.date}</small>
+              </div>
+            ))
+          )}
+        </div>
+      </>
+    );
+  }
+
+  function renderGerente() {
+    return (
+      <>
+        <SectionTitle
+          title="Painel do Gerente"
+          subtitle="Controle administrativo completo."
+        />
+
+        <div className="manager-grid">
+          <button onClick={() => setActiveTab("registrar-acao")}>
+            <span>⚔</span>
+            <b>Registrar Ação</b>
+            <small>Criar ação para os membros</small>
+          </button>
+
+          <button onClick={() => setActiveTab("vendas")}>
+            <span>◈</span>
+            <b>Registro de Venda</b>
+            <small>Cadastrar vendas</small>
+          </button>
+
+          <button onClick={() => setActiveTab("encomendas")}>
+            <span>▣</span>
+            <b>Encomendas</b>
+            <small>Pedidos e datas de entrega</small>
+          </button>
+
+          <button onClick={() => setActiveTab("lavagem")}>
+            <span>◆</span>
+            <b>Lavagem Cliente</b>
+            <small>Parceria, FAC e comprovantes</small>
+          </button>
+
+          <button onClick={() => setActiveTab("adv")}>
+            <span>!</span>
+            <b>ADV / Rebaixamento</b>
+            <small>ADV 1, 2 e 3</small>
+          </button>
+
+          <button onClick={() => setActiveTab("recrutamento")}>
+            <span>♙</span>
+            <b>Recrutamento</b>
+            <small>Registrar novos membros</small>
+          </button>
+
+          <button onClick={() => setActiveTab("registros")}>
+            <span>☷</span>
+            <b>Logs</b>
+            <small>Histórico geral</small>
+          </button>
+
+          <button onClick={() => setActiveTab("rankings")}>
+            <span>★</span>
+            <b>Rankings</b>
+            <small>Desempenho da equipe</small>
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  function renderContent() {
+    switch (activeTab) {
+      case "inicio":
+        return renderInicio();
+
+      case "registrar-acao":
+        return renderRegistrarAcao();
+
+      case "acoes":
+        return renderAcoes();
+
+      case "vendas":
+        return renderVendas();
+
+      case "encomendas":
+        return renderEncomendas();
+
+      case "adv":
+        return renderAdv();
+
+      case "lavagem":
+        return renderLavagem();
+
+      case "recrutamento":
+        return renderRecrutamento();
+
+      case "registros":
+        return renderRegistros();
+
+      case "membros":
+        return renderMembros();
+
+      case "rankings":
+        return renderRankings();
+
+      case "lider":
+        return renderLider();
+
+      case "gerente":
+        return renderGerente();
+
+      case "ausencia":
+        return renderMembros();
+
+      default:
+        return isManager
+          ? renderInicio()
+          : renderMembros();
+    }
+  }
+
+  return (
+    <div className="mf-dashboard">
+      <style>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        .mf-dashboard {
+          min-height: 100vh;
+          background:
+            radial-gradient(circle at 80% 0%, rgba(212,169,58,.10), transparent 28%),
+            #080808;
+          color: #f2f2f2;
+          display: flex;
+          font-family: Inter, Arial, sans-serif;
+        }
+
+        .mf-sidebar {
+          width: 265px;
+          min-height: 100vh;
+          background: #0c0c0c;
+          border-right: 1px solid rgba(212,169,58,.18);
+          padding: 25px 16px;
+          position: sticky;
+          top: 0;
+          height: 100vh;
+          overflow-y: auto;
+        }
+
+        .brand {
+          padding: 8px 12px 28px;
+          border-bottom: 1px solid rgba(255,255,255,.07);
+          margin-bottom: 20px;
+        }
+
+        .brand-mark {
+          width: 46px;
+          height: 46px;
+          border: 1px solid #d4a93a;
+          border-radius: 14px;
+          display: grid;
+          place-items: center;
+          color: #d4a93a;
+          font-size: 23px;
+          margin-bottom: 12px;
+          box-shadow: 0 0 25px rgba(212,169,58,.12);
+        }
+
+        .brand h1 {
+          margin: 0;
+          font-size: 18px;
+          letter-spacing: 2px;
+        }
+
+        .brand p {
+          margin: 6px 0 0;
+          color: #777;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 1.4px;
+        }
+
+        .menu-label {
+          color: #555;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          padding: 0 12px;
+          margin: 18px 0 8px;
+        }
+
+        .menu {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .menu button {
+          border: 0;
+          background: transparent;
+          color: #999;
+          padding: 12px;
+          border-radius: 12px;
+          cursor: pointer;
+          text-align: left;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          transition: .18s;
+          font-size: 13px;
+        }
+
+        .menu button:hover {
+          color: #fff;
+          background: rgba(255,255,255,.04);
+        }
+
+        .menu button.active {
+          background: linear-gradient(
+            90deg,
+            rgba(212,169,58,.18),
+            rgba(212,169,58,.05)
+          );
+          color: #d4a93a;
+          border: 1px solid rgba(212,169,58,.22);
+        }
+
+        .menu-icon {
+          width: 22px;
+          text-align: center;
+          font-size: 16px;
+        }
+
+        .sidebar-user {
+          margin-top: 25px;
+          padding: 14px;
+          background: #111;
+          border: 1px solid rgba(255,255,255,.06);
+          border-radius: 14px;
+        }
+
+        .sidebar-user span {
+          display: block;
+          color: #666;
+          font-size: 10px;
+          text-transform: uppercase;
+          margin-bottom: 5px;
+        }
+
+        .sidebar-user strong {
+          color: #ddd;
+          font-size: 13px;
+        }
+
+        .main {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .topbar {
+          height: 75px;
+          border-bottom: 1px solid rgba(255,255,255,.07);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 34px;
+          background: rgba(8,8,8,.86);
+          backdrop-filter: blur(15px);
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        .topbar-title {
+          font-size: 13px;
+          color: #888;
+        }
+
+        .topbar-title b {
+          color: #d4a93a;
+        }
+
+        .user-pill {
+          border: 1px solid rgba(212,169,58,.2);
+          border-radius: 999px;
+          padding: 8px 13px;
+          font-size: 12px;
+          color: #bbb;
+        }
+
+        .content {
+          max-width: 1500px;
+          margin: 0 auto;
+          padding: 35px;
+        }
+
+        .section-title {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-bottom: 28px;
+        }
+
+        .section-title h2 {
+          margin: 0;
+          font-size: 27px;
+          letter-spacing: -.5px;
+        }
+
+        .section-title p {
+          margin: 8px 0 0;
+          color: #777;
+          font-size: 13px;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+
+        .stat-card,
+        .panel-card,
+        .form-card,
+        .ranking-card,
+        .action-card,
+        .records-list {
+          background: linear-gradient(
+            145deg,
+            #111,
+            #0d0d0d
+          );
+          border: 1px solid rgba(255,255,255,.07);
+          border-radius: 18px;
+          box-shadow: 0 15px 40px rgba(0,0,0,.18);
+        }
+
+        .stat-card {
+          padding: 22px;
+        }
+
+        .stat-card span,
+        .info-grid span,
+        .wash-data span,
+        .record-row span {
+          color: #6f6f6f;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: .7px;
+          display: block;
+        }
+
+        .stat-card strong {
+          display: block;
+          color: #d4a93a;
+          font-size: 30px;
+          margin: 10px 0 5px;
+        }
+
+        .stat-card small {
+          color: #666;
+          font-size: 11px;
+        }
+
+        .dashboard-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 18px;
+        }
+
+        .panel-card {
+          padding: 23px;
+        }
+
+        .panel-card h3,
+        .records-list > h3 {
+          margin: 0 0 18px;
+          font-size: 15px;
+        }
+
+        .activity,
+        .mini-action,
+        .record-row {
+          border-bottom: 1px solid rgba(255,255,255,.06);
+          padding: 13px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .activity:last-child,
+        .mini-action:last-child {
+          border-bottom: 0;
+        }
+
+        .activity strong,
+        .mini-action strong {
+          display: block;
+          font-size: 13px;
+        }
+
+        .activity span,
+        .mini-action span {
+          display: block;
+          color: #777;
+          font-size: 11px;
+          margin-top: 4px;
+        }
+
+        .activity small {
+          color: #666;
+        }
+
+        .empty {
+          padding: 25px;
+          color: #666;
+          border: 1px dashed rgba(255,255,255,.08);
+          border-radius: 13px;
+          text-align: center;
+          font-size: 12px;
+        }
+
+        .empty.large {
+          padding: 75px 30px;
+        }
+
+        .empty-icon {
+          font-size: 36px;
+          color: #d4a93a;
+          margin-bottom: 12px;
+        }
+
+        .empty h3 {
+          color: #bbb;
+          margin: 0 0 8px;
+        }
+
+        .empty p {
+          margin: 0;
+          color: #666;
+        }
+
+        .form-card {
+          padding: 25px;
+          margin-bottom: 20px;
+        }
+
+        form {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        label {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          color: #999;
+          font-size: 12px;
+        }
+
+        input,
+        select,
+        textarea {
+          width: 100%;
+          border: 1px solid rgba(255,255,255,.08);
+          background: #090909;
+          color: #eee;
+          border-radius: 11px;
+          padding: 12px 13px;
+          outline: none;
+          font-family: inherit;
+          transition: .18s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+          border-color: rgba(212,169,58,.6);
+          box-shadow: 0 0 0 3px rgba(212,169,58,.07);
+        }
+
+        textarea {
+          min-height: 95px;
+          resize: vertical;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+        }
+
+        .gold-button,
+        .danger-button {
+          border: 0;
+          border-radius: 11px;
+          padding: 13px 18px;
+          cursor: pointer;
+          font-weight: 700;
+          font-size: 12px;
+          transition: .18s;
+        }
+
+        .gold-button {
+          background: linear-gradient(135deg, #d4a93a, #a97d18);
+          color: #080808;
+          box-shadow: 0 8px 25px rgba(212,169,58,.12);
+        }
+
+        .gold-button:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.08);
+        }
+
+        .gold-button:disabled {
+          opacity: .4;
+          cursor: not-allowed;
+        }
+
+        .danger-button {
+          background: rgba(160,50,50,.14);
+          border: 1px solid rgba(200,70,70,.25);
+          color: #dc7777;
+        }
+
+        .selected-action {
+          border: 1px solid rgba(212,169,58,.2);
+          background: rgba(212,169,58,.035);
+          border-radius: 15px;
+          padding: 20px;
+        }
+
+        .action-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+
+        .action-header h3,
+        .action-top h3 {
+          margin: 8px 0 4px;
+          font-size: 20px;
+        }
+
+        .action-header > strong,
+        .action-value {
+          color: #d4a93a;
+          font-size: 16px;
+          font-weight: 800;
+        }
+
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
+        }
+
+        .info-grid > div {
+          background: rgba(255,255,255,.025);
+          border: 1px solid rgba(255,255,255,.045);
+          border-radius: 11px;
+          padding: 13px;
+        }
+
+        .info-grid .full {
+          grid-column: 1 / -1;
+        }
+
+        .info-grid strong {
+          display: block;
+          margin-top: 7px;
+          color: #d0d0d0;
+          font-size: 12px;
+          line-height: 1.5;
+        }
+
+        .action-list {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 18px;
+        }
+
+        .action-card {
+          padding: 22px;
+        }
+
+        .action-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 18px;
+          gap: 15px;
+        }
+
+        .action-top > div:first-child span {
+          color: #777;
+          font-size: 11px;
+        }
+
+        .participants {
+          margin: 18px 0;
+          padding-top: 15px;
+          border-top: 1px solid rgba(255,255,255,.06);
+        }
+
+        .participants > span {
+          display: block;
+          color: #666;
+          font-size: 10px;
+          text-transform: uppercase;
+          margin-bottom: 9px;
+        }
+
+        .participant-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          border: 1px solid rgba(212,169,58,.25);
+          background: rgba(212,169,58,.09);
+          color: #d4a93a;
+          border-radius: 999px;
+          padding: 5px 9px;
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: .5px;
+        }
+
+        .badge-dark {
+          background: #171717;
+          border-color: rgba(255,255,255,.08);
+          color: #aaa;
+        }
+
+        .badge-warning {
+          color: #d6a94c;
+          border-color: rgba(214,169,76,.25);
+          background: rgba(214,169,76,.08);
+        }
+
+        .field-title {
+          color: #999;
+          font-size: 12px;
+          margin-bottom: -7px;
+        }
+
+        .product-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        .product-button,
+        .adv-button,
+        .choice {
+          border: 1px solid rgba(255,255,255,.08);
+          background: #0b0b0b;
+          color: #888;
+          padding: 14px;
+          border-radius: 12px;
+          cursor: pointer;
+          text-align: left;
+          transition: .18s;
+        }
+
+        .product-button span {
+          display: inline-grid;
+          place-items: center;
+          width: 21px;
+          height: 21px;
+          border-radius: 50%;
+          margin-right: 8px;
+          background: #151515;
+          color: #777;
+        }
+
+        .product-button.selected,
+        .adv-button.selected,
+        .choice.selected {
+          color: #d4a93a;
+          border-color: rgba(212,169,58,.5);
+          background: rgba(212,169,58,.09);
+        }
+
+        .product-button.selected span {
+          background: #d4a93a;
+          color: #080808;
+        }
+
+        .adv-grid,
+        .choice-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        .choice-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .records-list {
+          padding: 23px;
+        }
+
+        .record-row {
+          padding: 17px 0;
+        }
+
+        .record-row h3 {
+          margin: 7px 0 0;
+          font-size: 13px;
+        }
+
+        .record-row > div {
+          min-width: 0;
+        }
+
+        .record-row > div:nth-child(2),
+        .record-row > div:nth-child(3) {
+          text-align: right;
+        }
+
+        .record-row b {
+          display: block;
+          color: #ccc;
+          margin-top: 6px;
+          font-size: 12px;
+        }
+
+        .record-head {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-bottom: 20px;
+        }
+
+        .record-head h3 {
+          margin: 9px 0 0;
+        }
+
+        .wash-record {
+          border: 1px solid rgba(255,255,255,.06);
+          background: #0d0d0d;
+          padding: 20px;
+          border-radius: 14px;
+          margin-top: 12px;
+        }
+
+        .wash-data {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
+        }
+
+        .wash-data > div {
+          background: #101010;
+          padding: 12px;
+          border-radius: 10px;
+        }
+
+        .wash-data b {
+          display: block;
+          margin-top: 6px;
+          color: #ccc;
+          font-size: 12px;
+        }
+
+        .proof {
+          margin-top: 12px;
+          padding: 13px;
+          background: #101010;
+          border-radius: 10px;
+        }
+
+        .proof span {
+          color: #666;
+          font-size: 10px;
+          display: block;
+          text-transform: uppercase;
+        }
+
+        .proof b {
+          display: block;
+          margin-top: 5px;
+          color: #bbb;
+          font-size: 12px;
+        }
+
+        .wash-preview {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          padding: 16px;
+          border: 1px solid rgba(212,169,58,.2);
+          background: rgba(212,169,58,.05);
+          border-radius: 13px;
+        }
+
+        .wash-preview span {
+          display: block;
+          color: #777;
+          font-size: 10px;
+          text-transform: uppercase;
+        }
+
+        .wash-preview strong {
+          display: block;
+          color: #d4a93a;
+          font-size: 17px;
+          margin-top: 6px;
+        }
+
+        .file-name {
+          color: #d4a93a;
+          font-size: 10px;
+        }
+
+        .ranking-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 18px;
+        }
+
+        .ranking-card {
+          padding: 20px;
+        }
+
+        .ranking-title {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 12px;
+        }
+
+        .ranking-title span {
+          color: #d4a93a;
+          font-size: 20px;
+        }
+
+        .ranking-title h3 {
+          margin: 0;
+          font-size: 14px;
+        }
+
+        .ranking-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 13px 0;
+          border-top: 1px solid rgba(255,255,255,.05);
+        }
+
+        .position {
+          color: #d4a93a;
+          font-weight: 800;
+          width: 32px;
+        }
+
+        .rank-name {
+          flex: 1;
+        }
+
+        .rank-name strong {
+          display: block;
+          font-size: 12px;
+        }
+
+        .rank-name small {
+          color: #666;
+          font-size: 10px;
+        }
+
+        .points {
+          font-size: 18px;
+          font-weight: 800;
+          color: #ccc;
+        }
+
+        .member-hero {
+          display: flex;
+          align-items: center;
+          gap: 17px;
+          padding: 23px;
+          margin-bottom: 18px;
+          border-radius: 18px;
+          background: linear-gradient(
+            135deg,
+            rgba(212,169,58,.1),
+            rgba(255,255,255,.02)
+          );
+          border: 1px solid rgba(212,169,58,.18);
+        }
+
+        .avatar {
+          width: 55px;
+          height: 55px;
+          display: grid;
+          place-items: center;
+          border-radius: 16px;
+          color: #0b0b0b;
+          background: #d4a93a;
+          font-size: 22px;
+          font-weight: 800;
+        }
+
+        .member-hero span {
+          color: #d4a93a;
+          font-size: 9px;
+          letter-spacing: 1px;
+        }
+
+        .member-hero h2 {
+          margin: 5px 0;
+          font-size: 18px;
+        }
+
+        .member-hero p {
+          color: #666;
+          margin: 0;
+          font-size: 11px;
+        }
+
+        .manager-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+        }
+
+        .manager-grid button {
+          min-height: 145px;
+          border: 1px solid rgba(255,255,255,.07);
+          border-radius: 16px;
+          background: linear-gradient(145deg,#121212,#0c0c0c);
+          color: #ccc;
+          text-align: left;
+          padding: 20px;
+          cursor: pointer;
+          transition: .18s;
+        }
+
+        .manager-grid button:hover {
+          transform: translateY(-2px);
+          border-color: rgba(212,169,58,.35);
+          box-shadow: 0 15px 35px rgba(0,0,0,.25);
+        }
+
+        .manager-grid span {
+          display: block;
+          color: #d4a93a;
+          font-size: 24px;
+          margin-bottom: 17px;
+        }
+
+        .manager-grid b {
+          display: block;
+          font-size: 13px;
+        }
+
+        .manager-grid small {
+          display: block;
+          color: #666;
+          margin-top: 6px;
+          font-size: 10px;
+        }
+
+        .notice {
+          position: fixed;
+          right: 25px;
+          bottom: 25px;
+          z-index: 100;
+          background: #151515;
+          border: 1px solid rgba(212,169,58,.35);
+          color: #d4a93a;
+          padding: 14px 18px;
+          border-radius: 12px;
+          box-shadow: 0 15px 40px rgba(0,0,0,.4);
+          font-size: 12px;
+        }
+
+        @media (max-width: 1100px) {
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .action-list,
+          .ranking-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .manager-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .info-grid,
+          .wash-data {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 800px) {
+          .mf-dashboard {
+            display: block;
+          }
+
+          .mf-sidebar {
+            width: 100%;
+            min-height: auto;
+            height: auto;
+            position: relative;
+            border-right: 0;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+          }
+
+          .menu {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .sidebar-user {
+            display: none;
+          }
+
+          .topbar {
+            padding: 0 18px;
+          }
+
+          .content {
+            padding: 22px 15px;
+          }
+
+          .dashboard-grid,
+          .form-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .product-grid,
+          .manager-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .wash-preview {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 500px) {
+          .stats-grid,
+          .product-grid,
+          .manager-grid,
+          .adv-grid,
+          .choice-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .info-grid,
+          .wash-data {
+            grid-template-columns: 1fr;
+          }
+
+          .info-grid .full {
+            grid-column: auto;
+          }
+
+          .topbar-title {
+            display: none;
+          }
+        }
+      `}</style>
+
+      <aside className="mf-sidebar">
+        <div className="brand">
+          <div className="brand-mark">♛</div>
+          <h1>MORRO DO FÊNIX</h1>
+          <p>Sistema de gerenciamento</p>
+        </div>
+
+        <div className="menu-label">
+          Navegação
+        </div>
+
+        <nav className="menu">
+          {menu.map((item) => (
+            <button
+              key={item.id}
+              className={
+                activeTab === item.id ? "active" : ""
+              }
+              onClick={() => setActiveTab(item.id)}
+            >
+              <span className="menu-icon">
+                {item.icon}
+              </span>
+
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="sidebar-user">
+          <span>Usuário conectado</span>
+          <strong>{user?.nome || "Usuário"}</strong>
+          <span style={{ marginTop: 7 }}>
+            {role}
+          </span>
+        </div>
+      </aside>
+
+      <main className="main">
+        <header className="topbar">
+          <div className="topbar-title">
+            MORRO DO FÊNIX /{" "}
+            <b>
+              {menu.find((x) => x.id === activeTab)?.label ||
+                "Painel"}
+            </b>
+          </div>
+
+          <div className="user-pill">
+            {user?.nome || "Usuário"} • {role}
+          </div>
+        </header>
+
+        <section className="content">
+          {renderContent()}
+        </section>
+      </main>
+
+      {notice && <div className="notice">{notice}</div>}
     </div>
   );
 }
 
 /* =========================================================
-   CSS COMPLETO
-   Fica dentro do próprio Dashboard para não depender
-   de outro arquivo CSS.
-========================================================= */
-
-const CSS = `
-* {
-  box-sizing: border-box;
-}
-
-.mf-app {
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 80% 0%, rgba(212, 175, 55, .07), transparent 32%),
-    #070707;
-  color: #f4f1e8;
-  display: flex;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.mf-sidebar {
-  width: 270px;
-  min-height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 20;
-  padding: 25px 17px;
-  background: linear-gradient(180deg, #0d0d0d, #080808);
-  border-right: 1px solid rgba(212,175,55,.13);
-  display: flex;
-  flex-direction: column;
-}
-
-.mf-brand {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 5px 9px 25px;
-}
-
-.mf-brand-mark,
-.mf-logo {
-  width: 45px;
-  height: 45px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #f0d477, #9f7620);
-  color: #090909;
-  font-weight: 950;
-  box-shadow: 0 10px 30px rgba(212,175,55,.14);
-}
-
-.mf-brand strong {
-  display: block;
-  letter-spacing: 3px;
-  font-size: 14px;
-}
-
-.mf-brand span {
-  display: block;
-  color: #c7a74a;
-  letter-spacing: 2px;
-  font-size: 10px;
-  margin-top: 2px;
-}
-
-.mf-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px;
-  border: 1px solid rgba(255,255,255,.06);
-  border-radius: 15px;
-  background: rgba(255,255,255,.025);
-  margin-bottom: 23px;
-}
-
-.mf-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: rgba(212,175,55,.12);
-  color: #e6c65d;
-  border: 1px solid rgba(212,175,55,.22);
-  font-weight: 800;
-}
-
-.mf-profile strong,
-.mf-profile span {
-  display: block;
-}
-
-.mf-profile strong {
-  font-size: 13px;
-}
-
-.mf-profile span {
-  color: #8b887e;
-  font-size: 10px;
-  margin-top: 3px;
-  text-transform: uppercase;
-}
-
-.mf-nav {
-  overflow-y: auto;
-  flex: 1;
-  padding-right: 3px;
-}
-
-.mf-nav-title {
-  color: #6d6a62;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1.7px;
-  padding: 13px 12px 7px;
-}
-
-.mf-nav button {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: #99968e;
-  padding: 11px 13px;
-  margin: 2px 0;
-  border-radius: 11px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  text-align: left;
-  font-weight: 650;
-  font-size: 13px;
-  transition: .2s;
-}
-
-.mf-nav button span {
-  width: 21px;
-  text-align: center;
-  color: #716e65;
-}
-
-.mf-nav button:hover {
-  background: rgba(255,255,255,.045);
-  color: #eee;
-}
-
-.mf-nav button.active {
-  color: #f1d26a;
-  background: linear-gradient(90deg, rgba(212,175,55,.14), rgba(212,175,55,.035));
-  border: 1px solid rgba(212,175,55,.15);
-}
-
-.mf-nav button.active span {
-  color: #d4af37;
-}
-
-.mf-logout {
-  margin-top: 15px;
-  padding: 12px;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,.07);
-  background: rgba(255,255,255,.025);
-  color: #aaa69d;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.mf-logout:hover {
-  border-color: rgba(212,175,55,.25);
-  color: #e8ce72;
-}
-
-.mf-main {
-  width: calc(100% - 270px);
-  margin-left: 270px;
-  min-height: 100vh;
-}
-
-.mf-topbar {
-  height: 84px;
-  border-bottom: 1px solid rgba(255,255,255,.055);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  background: rgba(7,7,7,.86);
-  backdrop-filter: blur(15px);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.mf-kicker {
-  display: block;
-  color: #b99331;
-  font-size: 9px;
-  letter-spacing: 2px;
-  font-weight: 850;
-}
-
-.mf-topbar h1 {
-  font-size: 20px;
-  margin: 4px 0 0;
-  letter-spacing: -.5px;
-}
-
-.mf-top-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.mf-top-user strong,
-.mf-top-user small {
-  display: block;
-  text-align: right;
-}
-
-.mf-top-user strong {
-  font-size: 13px;
-}
-
-.mf-top-user small {
-  color: #85827a;
-  font-size: 9px;
-  margin-top: 2px;
-  text-transform: uppercase;
-}
-
-.mf-online {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #c9a936;
-  box-shadow: 0 0 10px rgba(201,169,54,.7);
-}
-
-.mf-mobile-menu {
-  display: none;
-}
-
-.mf-content {
-  max-width: 1450px;
-  margin: auto;
-  padding: 35px 40px 10px;
-}
-
-.mf-footer {
-  text-align: center;
-  color: #57544e;
-  font-size: 11px;
-  padding: 30px;
-}
-
-.mf-footer a {
-  color: #c8a43d;
-  text-decoration: none;
-}
-
-.mf-footer a:hover {
-  text-decoration: underline;
-}
-
-.mf-hero {
-  min-height: 190px;
-  padding: 35px;
-  border-radius: 22px;
-  border: 1px solid rgba(212,175,55,.13);
-  background:
-    radial-gradient(circle at 90% 10%, rgba(212,175,55,.13), transparent 35%),
-    linear-gradient(135deg, #11110f, #0b0b0b);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.mf-hero:after {
-  content: "";
-  position: absolute;
-  width: 220px;
-  height: 220px;
-  right: -90px;
-  bottom: -100px;
-  border: 1px solid rgba(212,175,55,.13);
-  border-radius: 50%;
-}
-
-.mf-hero h2 {
-  margin: 9px 0 8px;
-  font-size: 31px;
-  letter-spacing: -1px;
-}
-
-.mf-hero h2 em {
-  color: #d6b34c;
-  font-style: normal;
-}
-
-.mf-hero p {
-  margin: 0;
-  color: #85827b;
-  font-size: 13px;
-}
-
-.mf-hero-badge {
-  position: relative;
-  z-index: 1;
-  border: 1px solid rgba(212,175,55,.2);
-  background: rgba(212,175,55,.055);
-  padding: 15px 20px;
-  border-radius: 15px;
-  text-align: right;
-}
-
-.mf-hero-badge span,
-.mf-hero-badge strong {
-  display: block;
-}
-
-.mf-hero-badge span {
-  color: #77736a;
-  font-size: 8px;
-  letter-spacing: 1.5px;
-}
-
-.mf-hero-badge strong {
-  color: #d7b64d;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.mf-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin: 18px 0;
-}
-
-.mf-stat {
-  padding: 20px;
-  min-height: 125px;
-  border-radius: 17px;
-  background: #0d0d0d;
-  border: 1px solid rgba(255,255,255,.06);
-  position: relative;
-}
-
-.mf-stat-icon {
-  color: #bd9a35;
-  font-size: 17px;
-  margin-bottom: 15px;
-}
-
-.mf-stat span {
-  display: block;
-  color: #77746c;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: .7px;
-}
-
-.mf-stat strong {
-  display: block;
-  color: #eeeae0;
-  font-size: 23px;
-  margin-top: 4px;
-}
-
-.mf-card {
-  background: linear-gradient(145deg, #101010, #0b0b0b);
-  border: 1px solid rgba(255,255,255,.065);
-  border-radius: 20px;
-  padding: 25px;
-  margin-bottom: 18px;
-  box-shadow: 0 18px 60px rgba(0,0,0,.12);
-}
-
-.mf-admin-card {
-  border-color: rgba(212,175,55,.16);
-  background:
-    radial-gradient(circle at 100% 0%, rgba(212,175,55,.07), transparent 32%),
-    #0e0e0d;
-}
-
-.mf-section-title {
-  margin-bottom: 22px;
-}
-
-.mf-section-title > div > span {
-  color: #aa8830;
-  font-size: 8px;
-  letter-spacing: 1.8px;
-  font-weight: 850;
-}
-
-.mf-section-title h2 {
-  margin: 5px 0 4px;
-  font-size: 22px;
-  letter-spacing: -.4px;
-}
-
-.mf-section-title p {
-  color: #74716a;
-  font-size: 12px;
-  margin: 0;
-}
-
-.mf-panel-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.mf-quick {
-  min-height: 95px;
-  padding: 17px;
-  border-radius: 15px;
-  background: #0b0b0b;
-  border: 1px solid rgba(255,255,255,.06);
-  color: #eee;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  text-align: left;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.mf-quick:hover {
-  transform: translateY(-2px);
-  border-color: rgba(212,175,55,.3);
-}
-
-.mf-quick-icon {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  color: #d5b54d;
-  background: rgba(212,175,55,.09);
-}
-
-.mf-quick div:nth-child(2) {
-  flex: 1;
-}
-
-.mf-quick strong,
-.mf-quick span {
-  display: block;
-}
-
-.mf-quick strong {
-  font-size: 13px;
-}
-
-.mf-quick span {
-  color: #77746c;
-  font-size: 10px;
-  margin-top: 4px;
-}
-
-.mf-quick b {
-  color: #c09b35;
-}
-
-.mf-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  margin-bottom: 17px;
-}
-
-.mf-field {
-  margin-bottom: 15px;
-}
-
-.mf-field label,
-.mf-label {
-  display: block;
-  color: #8d8980;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 7px;
-}
-
-.mf-field input,
-.mf-field select,
-.mf-filter {
-  width: 100%;
-  min-height: 45px;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,.08);
-  background: #090909;
-  color: #e8e5dc;
-  padding: 0 13px;
-  outline: none;
-}
-
-.mf-field input:focus,
-.mf-field select:focus {
-  border-color: rgba(212,175,55,.5);
-  box-shadow: 0 0 0 3px rgba(212,175,55,.05);
-}
-
-.mf-btn {
-  border: 0;
-  min-height: 44px;
-  padding: 0 18px;
-  border-radius: 11px;
-  cursor: pointer;
-  font-weight: 800;
-  font-size: 11px;
-  transition: .2s;
-}
-
-.mf-btn-gold {
-  color: #090909;
-  background: linear-gradient(135deg, #f1d26a, #b98d28);
-  box-shadow: 0 8px 25px rgba(185,141,40,.13);
-}
-
-.mf-btn-gold:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
-
-.mf-btn:disabled {
-  opacity: .38;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.mf-btn-outline {
-  background: transparent;
-  color: #c6a33e;
-  border: 1px solid rgba(212,175,55,.25);
-}
-
-.mf-btn-outline:hover {
-  background: rgba(212,175,55,.07);
-}
-
-.mf-error,
-.mf-success {
-  border-radius: 10px;
-  padding: 11px 13px;
-  margin-bottom: 15px;
-  font-size: 11px;
-}
-
-.mf-error {
-  color: #e0a5a5;
-  background: rgba(150,50,50,.08);
-  border: 1px solid rgba(180,70,70,.18);
-}
-
-.mf-success {
-  color: #d5b952;
-  background: rgba(212,175,55,.07);
-  border: 1px solid rgba(212,175,55,.17);
-}
-
-.mf-toolbar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.mf-filter {
-  width: 150px;
-}
-
-.mf-action-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-}
-
-.mf-action {
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 17px;
-  padding: 19px;
-  background: #0a0a0a;
-}
-
-.mf-action.large {
-  border-color: rgba(212,175,55,.2);
-  background:
-    radial-gradient(circle at 100% 0%, rgba(212,175,55,.07), transparent 30%),
-    #0a0a0a;
-}
-
-.mf-action-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  align-items: flex-start;
-}
-
-.mf-tag {
-  color: #b99431;
-  font-size: 8px;
-  letter-spacing: 1.5px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.mf-action h3 {
-  margin: 5px 0 0;
-  font-size: 18px;
-}
-
-.mf-action-value {
-  color: #d5b54b;
-  font-weight: 800;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.mf-action-details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin: 18px 0;
-}
-
-.mf-action-details div {
-  padding: 10px;
-  background: rgba(255,255,255,.025);
-  border-radius: 10px;
-}
-
-.mf-action-details span,
-.mf-action-details strong {
-  display: block;
-}
-
-.mf-action-details span {
-  color: #69665f;
-  font-size: 8px;
-  text-transform: uppercase;
-}
-
-.mf-action-details strong {
-  color: #bdb9ae;
-  font-size: 10px;
-  margin-top: 4px;
-}
-
-.mf-description {
-  border-top: 1px solid rgba(255,255,255,.055);
-  border-bottom: 1px solid rgba(255,255,255,.055);
-  padding: 12px 0;
-  margin-bottom: 15px;
-}
-
-.mf-description span {
-  color: #766f5e;
-  font-size: 8px;
-  letter-spacing: 1px;
-}
-
-.mf-description p {
-  color: #9c9990;
-  font-size: 11px;
-  line-height: 1.6;
-  margin: 5px 0 0;
-}
-
-.mf-participant-head {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 9px;
-}
-
-.mf-participant-head strong {
-  font-size: 11px;
-}
-
-.mf-participant-head span {
-  color: #c9a83f;
-  font-size: 10px;
-}
-
-.mf-member-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  min-height: 28px;
-  margin-bottom: 12px;
-}
-
-.mf-member-chip {
-  padding: 6px 9px;
-  border-radius: 8px;
-  background: rgba(212,175,55,.08);
-  color: #d0b24d;
-  font-size: 9px;
-  border: 1px solid rgba(212,175,55,.12);
-}
-
-.mf-product-box {
-  margin: 5px 0 20px;
-}
-
-.mf-product-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 9px;
-}
-
-.mf-product {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.07);
-  background: #090909;
-  color: #88857d;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 700;
-  transition: .2s;
-}
-
-.mf-product span {
-  color: #66635d;
-  margin-right: 6px;
-}
-
-.mf-product:hover,
-.mf-product.selected {
-  border-color: rgba(212,175,55,.4);
-  color: #dfc45c;
-  background: rgba(212,175,55,.07);
-}
-
-.mf-product.selected span {
-  color: #dfc45c;
-}
-
-.mf-wash-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.mf-wash-summary div {
-  padding: 17px;
-  border-radius: 13px;
-  background: #090909;
-  border: 1px solid rgba(255,255,255,.06);
-}
-
-.mf-wash-summary span,
-.mf-wash-summary strong,
-.mf-wash-summary small {
-  display: block;
-}
-
-.mf-wash-summary span {
-  color: #737067;
-  font-size: 8px;
-  text-transform: uppercase;
-}
-
-.mf-wash-summary strong {
-  color: #ddd8ca;
-  font-size: 16px;
-  margin-top: 6px;
-}
-
-.mf-wash-summary small {
-  color: #c4a13b;
-  font-size: 9px;
-  margin-top: 3px;
-}
-
-.mf-preview {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding: 15px;
-  border-radius: 14px;
-  background: rgba(212,175,55,.035);
-  border: 1px solid rgba(212,175,55,.11);
-  margin-bottom: 18px;
-}
-
-.mf-preview span,
-.mf-preview strong {
-  display: block;
-}
-
-.mf-preview span {
-  color: #706d65;
-  font-size: 7px;
-  letter-spacing: 1px;
-}
-
-.mf-preview strong {
-  color: #c8c3b8;
-  font-size: 10px;
-  margin-top: 5px;
-}
-
-.mf-select-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 10px 0 20px;
-}
-
-.mf-select-card {
-  padding: 20px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.07);
-  background: #090909;
-  color: #aaa;
-  cursor: pointer;
-  text-align: left;
-  transition: .2s;
-}
-
-.mf-select-card:hover,
-.mf-select-card.selected {
-  border-color: rgba(212,175,55,.42);
-  background: rgba(212,175,55,.07);
-}
-
-.mf-select-card span,
-.mf-select-card strong,
-.mf-select-card small {
-  display: block;
-}
-
-.mf-select-card span {
-  color: #c7a13a;
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-
-.mf-select-card strong {
-  color: #eee;
-  font-size: 13px;
-}
-
-.mf-select-card small {
-  color: #716e67;
-  margin-top: 4px;
-  font-size: 9px;
-}
-
-.mf-ranking-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-}
-
-.mf-ranking-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.mf-ranking-title span {
-  color: #d1ae45;
-}
-
-.mf-ranking-title h3 {
-  margin: 0;
-  font-size: 14px;
-}
-
-.mf-ranking-list {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.mf-ranking-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.025);
-}
-
-.mf-ranking-item > strong {
-  width: 30px;
-  color: #c6a33c;
-}
-
-.mf-ranking-item div {
-  flex: 1;
-}
-
-.mf-ranking-item span,
-.mf-ranking-item small {
-  display: block;
-}
-
-.mf-ranking-item span {
-  font-size: 11px;
-  color: #d5d1c7;
-}
-
-.mf-ranking-item small {
-  color: #67645e;
-  font-size: 8px;
-  margin-top: 3px;
-}
-
-.mf-ranking-item > b {
-  color: #c6a33c;
-  font-size: 12px;
-}
-
-.mf-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 15px;
-}
-
-.mf-tabs button {
-  padding: 9px 12px;
-  border-radius: 9px;
-  border: 1px solid rgba(255,255,255,.07);
-  background: #0d0d0d;
-  color: #77746d;
-  cursor: pointer;
-  font-size: 9px;
-  font-weight: 800;
-}
-
-.mf-tabs button:hover,
-.mf-tabs button.active {
-  color: #d4b44e;
-  border-color: rgba(212,175,55,.3);
-  background: rgba(212,175,55,.07);
-}
-
-.mf-records {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.mf-record {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  padding: 16px;
-  border-radius: 13px;
-  background: #0b0b0b;
-  border: 1px solid rgba(255,255,255,.055);
-}
-
-.mf-record-type {
-  color: #aa8730;
-  font-size: 8px;
-  letter-spacing: 1.2px;
-  font-weight: 850;
-}
-
-.mf-record h3 {
-  margin: 5px 0 4px;
-  font-size: 13px;
-}
-
-.mf-record p {
-  margin: 0;
-  color: #6e6b64;
-  font-size: 9px;
-}
-
-.mf-record-side {
-  text-align: right;
-}
-
-.mf-record-side strong,
-.mf-record-side span {
-  display: block;
-}
-
-.mf-record-side strong {
-  color: #77746c;
-  font-size: 8px;
-}
-
-.mf-record-side span {
-  color: #c9a73e;
-  font-size: 10px;
-  margin-top: 5px;
-}
-
-.mf-status {
-  padding: 4px 7px;
-  border-radius: 5px;
-  background: rgba(212,175,55,.08);
-  color: #c7a640 !important;
-}
-
-.mf-empty {
-  min-height: 150px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #66635d;
-  text-align: center;
-  border: 1px dashed rgba(255,255,255,.07);
-  border-radius: 14px;
-}
-
-.mf-empty-icon {
-  color: #a2812e;
-  font-size: 24px;
-  margin-bottom: 8px;
-}
-
-.mf-empty strong {
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.mf-loading {
-  min-height: 100vh;
-  background: #070707;
-  color: #d4af37;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.mf-loading strong {
-  color: #eee;
-  font-size: 17px;
-}
-
-.mf-loading span {
-  color: #68655e;
-  font-size: 10px;
-}
-
-@media (max-width: 1100px) {
-  .mf-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .mf-action-grid,
-  .mf-ranking-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 800px) {
-  .mf-sidebar {
-    transform: translateX(-100%);
-    transition: .25s;
-  }
-
-  .mf-sidebar.open {
-    transform: translateX(0);
-  }
-
-  .mf-main {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .mf-mobile-menu {
-    display: block;
-    border: 0;
-    background: transparent;
-    color: #d3b34c;
-    font-size: 21px;
-    cursor: pointer;
-  }
-
-  .mf-topbar {
-    padding: 0 20px;
-    gap: 15px;
-  }
-
-  .mf-topbar h1 {
-    font-size: 17px;
-  }
-
-  .mf-content {
-    padding: 25px 18px;
-  }
-
-  .mf-form-grid,
-  .mf-panel-grid,
-  .mf-wash-summary,
-  .mf-preview {
-    grid-template-columns: 1fr;
-  }
-
-  .mf-hero {
-    padding: 25px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .mf-hero h2 {
-    font-size: 25px;
-  }
-
-  .mf-hero-badge {
-    text-align: left;
-  }
-}
-
-@media (max-width: 550px) {
-  .mf-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .mf-card {
-    padding: 18px;
-  }
-
-  .mf-action-details {
-    grid-template-columns: 1fr;
-  }
-
-  .mf-select-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .mf-top-user {
-    display: none;
-  }
-
-  .mf-record {
-    flex-direction: column;
-  }
-
-  .mf-record-side {
-    text-align: left;
-  }
-}
-`;
+   COMPONENTE AUXILIAR
+   ========================================================= */
+
+function RecordsTable({
+  title,
+  data,
+  empty,
+  render,
+}) {
+  return (
+    <div className="records-list">
+      <h3>{title}</h3>
+
+      {data.length === 0 ? (
+        <div className="empty">{empty}</div>
+      ) : (
+        data.map((item) => (
+          <div className="record-row" key={item.id}>
+            <div>{render(item)}</div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+export default Dashboard;
