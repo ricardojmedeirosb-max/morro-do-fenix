@@ -58,15 +58,4 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log("");
-  console.log("======================================");
-  console.log("       MORRO DO FÊNIX");
-  console.log("======================================");
-  console.log(`Backend: http://localhost:${PORT}`);
-  console.log(
-    `Health:  http://localhost:${PORT}/api/health`
-  );
-  console.log("======================================");
-  console.log("");
-});
+export default app;
