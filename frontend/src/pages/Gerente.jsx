@@ -1,62 +1,19 @@
+```jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const PAINEIS = [
-  {
-    id: "inicio",
-    nome: "Dashboard",
-    icone: "⌂",
-  },
-  {
-    id: "membros",
-    nome: "Membros",
-    icone: "♙",
-  },
-  {
-    id: "aprovacoes",
-    nome: "Aprovações",
-    icone: "✓",
-  },
-  {
-    id: "vendas",
-    nome: "Vendas",
-    icone: "R$",
-  },
-  {
-    id: "lavagens",
-    nome: "Lavagens",
-    icone: "◇",
-  },
-  {
-    id: "encomendas",
-    nome: "Encomendas",
-    icone: "▣",
-  },
-  {
-    id: "blacklist",
-    nome: "Blacklist",
-    icone: "!",
-  },
-  {
-    id: "logs",
-    nome: "Logs",
-    icone: "▤",
-  },
-  {
-    id: "registros",
-    nome: "Registros",
-    icone: "▦",
-  },
-  {
-    id: "usuarios",
-    nome: "Usuários",
-    icone: "♟",
-  },
-  {
-    id: "permissoes",
-    nome: "Permissões",
-    icone: "⚿",
-  },
+  { id: "inicio", nome: "Dashboard", icone: "⌂" },
+  { id: "membros", nome: "Membros", icone: "♙" },
+  { id: "aprovacoes", nome: "Aprovações", icone: "✓" },
+  { id: "vendas", nome: "Vendas", icone: "R$" },
+  { id: "lavagens", nome: "Lavagens", icone: "◇" },
+  { id: "encomendas", nome: "Encomendas", icone: "▣" },
+  { id: "blacklist", nome: "Blacklist", icone: "!" },
+  { id: "logs", nome: "Logs", icone: "▤" },
+  { id: "registros", nome: "Registros", icone: "▦" },
+  { id: "usuarios", nome: "Usuários", icone: "♟" },
+  { id: "permissoes", nome: "Permissões", icone: "⚿" },
 ];
 
 function Gerente() {
@@ -71,9 +28,7 @@ function Gerente() {
   }, []);
 
   async function verificarAcesso() {
-    const token = localStorage.getItem(
-      "morro_fenix_token"
-    );
+    const token = localStorage.getItem("morro_fenix_token");
 
     if (!token) {
       navigate("/login");
@@ -81,46 +36,70 @@ function Gerente() {
     }
 
     try {
-      const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+      const API_URL = (
+        import.meta.env.VITE_API_URL || ""
+      ).replace(/\/+$/, "");
 
-      const resposta = await fetch(`${API_URL}/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const resposta = await fetch(
+        `${API_URL}/api/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const dados = await resposta.json();
 
       if (
         !resposta.ok ||
-        !dados.sucesso
+        !dados.sucesso ||
+        !dados.usuario
       ) {
-        localStorage.removeItem(
-          "morro_fenix_token"
-        );
-
-        localStorage.removeItem(
-          "morro_fenix_usuario"
-        );
+        localStorage.removeItem("morro_fenix_token");
+        localStorage.removeItem("morro_fenix_usuario");
 
         navigate("/login");
         return;
       }
 
+      const cargo = String(
+        dados.usuario.cargo || ""
+      ).toUpperCase();
+
+      // GERENTE, LIDER e SUPER_ADMIN
+      // possuem acesso ao modo administrativo.
       if (
-        dados.usuario.cargo !== "GERENTE" &&
-        dados.usuario.cargo !== "LIDER"
+        cargo !== "GERENTE" &&
+        cargo !== "LIDER" &&
+        cargo !== "SUPER_ADMIN"
       ) {
         navigate("/dashboard");
         return;
       }
 
-      setUsuario(dados.usuario);
+      const usuarioAtual = {
+        ...dados.usuario,
+        nome_completo:
+          dados.usuario.nome_completo ||
+          dados.usuario.nome ||
+          "Usuário",
+        cargo,
+      };
 
+      setUsuario(usuarioAtual);
+
+      localStorage.setItem(
+        "morro_fenix_usuario",
+        JSON.stringify(usuarioAtual)
+      );
     } catch (error) {
-      console.error(error);
-      navigate("/login");
+      console.error(
+        "Erro ao verificar acesso:",
+        error
+      );
 
+      navigate("/login");
     } finally {
       setCarregando(false);
     }
@@ -142,6 +121,9 @@ function Gerente() {
     return null;
   }
 
+  const ehSuperAdmin =
+    usuario.cargo === "SUPER_ADMIN";
+
   return (
     <div className="dashboard gerente">
 
@@ -158,7 +140,9 @@ function Gerente() {
               color: "#d4af37",
             }}
           >
-            MODO GERENTE
+            {ehSuperAdmin
+              ? "SUPER ADMIN"
+              : "MODO GERENTE"}
           </small>
         </div>
 
@@ -205,7 +189,9 @@ function Gerente() {
 
           <div>
             <span>
-              ADMINISTRAÇÃO
+              {ehSuperAdmin
+                ? "SUPER ADMINISTRAÇÃO"
+                : "ADMINISTRAÇÃO"}
             </span>
 
             <h1>
@@ -215,7 +201,7 @@ function Gerente() {
 
           <div className="user-info">
             <strong>
-              {usuario.nome}
+              {usuario.nome_completo}
             </strong>
 
             <span>
@@ -225,13 +211,47 @@ function Gerente() {
 
         </header>
 
+        {ehSuperAdmin && (
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "14px 18px",
+              border: "1px solid #d4af37",
+              borderRadius: "10px",
+              background:
+                "rgba(212, 175, 55, 0.08)",
+            }}
+          >
+            <strong
+              style={{
+                color: "#d4af37",
+              }}
+            >
+              ACESSO SUPREMO
+            </strong>
+
+            <div
+              style={{
+                marginTop: "4px",
+                opacity: 0.8,
+              }}
+            >
+              Esta conta possui acesso administrativo
+              completo ao sistema.
+            </div>
+          </div>
+        )}
+
         {painel === "inicio" && (
-          <DashboardInicio />
+          <DashboardInicio
+            usuario={usuario}
+          />
         )}
 
         {painel !== "inicio" && (
           <PainelGerente
             nome={obterNomePainel(painel)}
+            superAdmin={ehSuperAdmin}
           />
         )}
 
@@ -248,13 +268,18 @@ function Gerente() {
   );
 }
 
-function DashboardInicio() {
+function DashboardInicio({ usuario }) {
+  const ehSuperAdmin =
+    usuario?.cargo === "SUPER_ADMIN";
+
   return (
     <>
       <section className="welcome">
 
         <p>
-          MODO GERENTE
+          {ehSuperAdmin
+            ? "SUPER ADMIN"
+            : "MODO GERENTE"}
         </p>
 
         <h2>
@@ -262,7 +287,11 @@ function DashboardInicio() {
         </h2>
 
         <span>
-          Gerencie os principais recursos
+          Bem-vindo,{" "}
+          <strong>
+            {usuario?.nome_completo}
+          </strong>
+          . Gerencie os principais recursos
           do sistema Morro do Fênix.
         </span>
 
@@ -271,39 +300,23 @@ function DashboardInicio() {
       <section className="stats">
 
         <div className="stat-card">
-          <span>
-            Membros
-          </span>
-          <strong>
-            —
-          </strong>
+          <span>Membros</span>
+          <strong>—</strong>
         </div>
 
         <div className="stat-card">
-          <span>
-            Vendas
-          </span>
-          <strong>
-            —
-          </strong>
+          <span>Vendas</span>
+          <strong>—</strong>
         </div>
 
         <div className="stat-card">
-          <span>
-            Registros
-          </span>
-          <strong>
-            —
-          </strong>
+          <span>Registros</span>
+          <strong>—</strong>
         </div>
 
         <div className="stat-card">
-          <span>
-            Lavagens
-          </span>
-          <strong>
-            —
-          </strong>
+          <span>Lavagens</span>
+          <strong>—</strong>
         </div>
 
       </section>
@@ -311,22 +324,27 @@ function DashboardInicio() {
   );
 }
 
-function PainelGerente({ nome }) {
+function PainelGerente({
+  nome,
+  superAdmin,
+}) {
   return (
     <section className="module-card">
 
       <div className="module-header">
-
         <div>
+
           <span>
-            ADMINISTRAÇÃO
+            {superAdmin
+              ? "SUPER ADMINISTRAÇÃO"
+              : "ADMINISTRAÇÃO"}
           </span>
 
           <h2>
             {nome}
           </h2>
-        </div>
 
+        </div>
       </div>
 
       <div className="empty-module">
@@ -336,8 +354,9 @@ function PainelGerente({ nome }) {
         </strong>
 
         <span>
-          Painel administrativo preparado
-          para integração com o banco de dados.
+          {superAdmin
+            ? "Acesso completo de Super Admin. Este painel está liberado para esta conta."
+            : "Painel administrativo preparado para integração com o banco de dados."}
         </span>
 
       </div>
@@ -357,3 +376,4 @@ function obterNomePainel(id) {
 }
 
 export default Gerente;
+```
