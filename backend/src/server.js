@@ -15,9 +15,27 @@ const FRONTEND_URL =
   process.env.FRONTEND_URL ||
   "https://morro-do-fenix-reiu.vercel.app";
 
+const allowedOrigins = [
+  FRONTEND_URL,
+];
+
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/morro-do-fenix-reiu-[a-z0-9]+-ricardos-projects-cf46dfa2\.vercel\.app$/.test(origin);
+
+      if (isAllowed) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Origem não autorizada pelo CORS."));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
