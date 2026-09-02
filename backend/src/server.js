@@ -34,7 +34,7 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(new Error("Origem nÃ£o autorizada pelo CORS."));
+      return callback(new Error("Origem não autorizada pelo CORS."));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -47,7 +47,7 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.json({
     sucesso: true,
-    sistema: "Morro do FÃªnix",
+    sistema: "Morro do Fênix",
     status: "online",
   });
 });
@@ -60,7 +60,7 @@ app.use("/api", paineisRoutes);
 app.use((req, res) => {
   res.status(404).json({
     sucesso: false,
-    mensagem: "Rota nÃ£o encontrada.",
+    mensagem: "Rota não encontrada.",
   });
 });
 
