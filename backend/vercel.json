@@ -13,4 +13,3 @@
     }
   ]
 }
-'@ | Set-Content ".\backend\vercel.json"
