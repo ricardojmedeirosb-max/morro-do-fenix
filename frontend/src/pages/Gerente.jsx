@@ -81,14 +81,13 @@ function Gerente() {
     }
 
     try {
-      const resposta = await fetch(
-        "http://localhost:3000/api/auth/me",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      const resposta = await fetch(`${API_URL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const dados = await resposta.json();
 
