@@ -81,7 +81,7 @@ function Gerente() {
     }
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL;
+      const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
       const resposta = await fetch(`${API_URL}/api/auth/me`, {
         headers: {
