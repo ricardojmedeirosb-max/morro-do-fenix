@@ -137,7 +137,7 @@ export function exigirGerente(req, res, next) {
     .trim()
     .toUpperCase();
 
-  if (cargo !== "GERENTE" && cargo !== "LIDER") {
+  if (cargo !== "GERENTE" && cargo !== "LIDER" && cargo !== "SUPER_ADMIN") {
     return res.status(403).json({
       sucesso: false,
       mensagem:
@@ -163,7 +163,7 @@ export function exigirSomenteGerente(req, res, next) {
     .trim()
     .toUpperCase();
 
-  if (cargo !== "GERENTE") {
+  if (cargo !== "GERENTE" && cargo !== "SUPER_ADMIN") {
     return res.status(403).json({
       sucesso: false,
       mensagem:
@@ -189,6 +189,7 @@ export function exigirMembro(req, res, next) {
     "GERENTE",
     "LIDER",
     "MEMBRO",
+    "SUPER_ADMIN",
   ];
 
   const cargo = String(req.usuario.cargo || "")
@@ -227,7 +228,7 @@ export function exigirLider(req, res, next) {
     .trim()
     .toUpperCase();
 
-  if (cargo !== "LIDER" && cargo !== "GERENTE") {
+  if (cargo !== "LIDER" && cargo !== "GERENTE" && cargo !== "SUPER_ADMIN") {
     return res.status(403).json({
       sucesso: false,
       mensagem:
@@ -256,7 +257,7 @@ export function exigirGerenteTotal(req, res, next) {
     .trim()
     .toUpperCase();
 
-  if (cargo !== "GERENTE") {
+  if (cargo !== "GERENTE" && cargo !== "SUPER_ADMIN") {
     return res.status(403).json({
       sucesso: false,
       mensagem:

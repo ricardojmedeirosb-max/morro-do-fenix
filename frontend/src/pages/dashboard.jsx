@@ -372,9 +372,29 @@ function save(key, value) {
 
 function getCurrentUser() {
   try {
-    return JSON.parse(localStorage.getItem("usuario")) ||
-      JSON.parse(localStorage.getItem("user")) ||
-      {};
+    const raw =
+      localStorage.getItem("morro_fenix_usuario") ||
+      localStorage.getItem("usuario") ||
+      localStorage.getItem("user");
+
+    if (!raw) return {};
+
+    const usuario = JSON.parse(raw);
+
+    return {
+      ...usuario,
+      nome:
+        usuario?.nome ||
+        usuario?.nome_completo ||
+        "Usuário",
+      cargo: String(
+        usuario?.cargo ||
+        usuario?.role ||
+        usuario?.perfil ||
+        usuario?.tipo ||
+        "MEMBRO"
+      ).trim().toUpperCase(),
+    };
   } catch {
     return {};
   }
@@ -398,23 +418,18 @@ function SectionTitle({ title, subtitle }) {
 function Dashboard() {
   const user = getCurrentUser();
 
-  const role = String(
-    user?.cargo ||
-      user?.role ||
-      user?.perfil ||
-      user?.tipo ||
-      "membro"
-  ).toLowerCase();
+  const role = String(user?.cargo || "MEMBRO")
+    .trim()
+    .toUpperCase();
+
+  const isSuperAdmin = role === "SUPER_ADMIN";
 
   const isManager =
-    role.includes("gerente") ||
-    role.includes("admin") ||
-    role.includes("dono") ||
-    role.includes("owner");
+    role === "GERENTE" ||
+    isSuperAdmin;
 
   const isLeader =
-    role.includes("lider") ||
-    role.includes("líder") ||
+    role === "LIDER" ||
     isManager;
 
   const [activeTab, setActiveTab] = useState(
