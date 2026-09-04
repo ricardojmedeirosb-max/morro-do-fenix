@@ -10,9 +10,11 @@ function Acoes({ usuario }) {
   const [data, setData] = useState("");
   const [hora, setHora] = useState("");
 
+  const cargo = String(usuario?.cargo || "MEMBRO").trim().toUpperCase();
   const podeGerenciar =
-    usuario?.cargo === "GERENTE" ||
-    usuario?.cargo === "LIDER";
+    cargo === "GERENTE" ||
+    cargo === "LIDER" ||
+    cargo === "SUPER_ADMIN";
 
   useEffect(() => {
     const salvas = JSON.parse(

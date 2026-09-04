@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || "https://morro-do-fenix-edz2.vercel.app").replace(/\/+$/, "");
 
 export default function Login() {
   const navigate = useNavigate();

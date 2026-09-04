@@ -416,7 +416,41 @@ function SectionTitle({ title, subtitle }) {
 }
 
 function Dashboard() {
-  const user = getCurrentUser();
+  const [user, setUser] = useState(() => getCurrentUser());
+
+  // O banco/API é a fonte oficial do cargo. O localStorage serve apenas
+  // como cache para evitar que um cargo antigo (ex.: MEMBRO) fique preso.
+  useEffect(() => {
+    const token = localStorage.getItem("morro_fenix_token");
+    if (!token) return;
+
+    const API_URL = (import.meta.env.VITE_API_URL || "https://morro-do-fenix-edz2.vercel.app").replace(/\/+$/, "");
+
+    fetch(`${API_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(async (res) => {
+        const dados = await res.json().catch(() => ({}));
+        if (!res.ok || !dados.sucesso || !dados.usuario) {
+          throw new Error(dados.mensagem || "Sessão inválida.");
+        }
+        return dados.usuario;
+      })
+      .then((usuarioApi) => {
+        const usuarioAtual = {
+          ...usuarioApi,
+          nome: usuarioApi.nome || usuarioApi.nome_completo || "Usuário",
+          nome_completo: usuarioApi.nome_completo || usuarioApi.nome || "Usuário",
+          cargo: String(usuarioApi.cargo || "MEMBRO").trim().toUpperCase(),
+        };
+
+        setUser(usuarioAtual);
+        localStorage.setItem("morro_fenix_usuario", JSON.stringify(usuarioAtual));
+      })
+      .catch((error) => {
+        console.error("Erro ao atualizar sessão:", error);
+      });
+  }, []);
 
   const role = String(user?.cargo || "MEMBRO")
     .trim()

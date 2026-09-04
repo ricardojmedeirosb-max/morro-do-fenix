@@ -36,7 +36,7 @@ function Gerente() {
 
     try {
       const API_URL = (
-        import.meta.env.VITE_API_URL || ""
+        import.meta.env.VITE_API_URL || "https://morro-do-fenix-edz2.vercel.app"
       ).replace(/\/+$/, "");
 
       const resposta = await fetch(
